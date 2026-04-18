@@ -41,7 +41,13 @@ Browser Form
 cp .env.example .env
 ```
 
-2. 在 `.env` 中填好至少一个 provider 的 API key，例如 `OPENAI_API_KEY` 或 `DOUBAO_API_KEY`。
+2. 在 `.env` 中填好至少一个 provider 的完整默认配置。除了 API key，也建议把默认 `Base URL` 和 `Model` 一起填好, especially if you use a relay / proxy endpoint instead of the original vendor API.
+
+Examples:
+
+- `OPENAI_BASE_URL`, `OPENAI_MODEL`, `OPENAI_API_KEY`
+- `DOUBAO_BASE_URL`, `DOUBAO_MODEL`, `DOUBAO_API_KEY`
+- `CUSTOM_LLM_BASE_URL`, `CUSTOM_LLM_MODEL`, `CUSTOM_LLM_API_KEY`
 
 3. 按需修改 [config/llm_providers.example.json](/Users/xiaoyu/code/Grafinder/config/llm_providers.example.json)。
    这里定义了 provider 名称、默认 Base URL、默认模型以及对应的 API key 环境变量。
@@ -74,9 +80,12 @@ docker compose up -d postgres grafana
 Grafinder 的 LLM 调用层是 provider registry 设计：
 
 - 页面默认从 provider 配置文件读取可选项
+- `.env` 也可以直接覆盖 provider 的默认 `Base URL` 和 `Model`
 - 用户可以在提交任务时切换 provider
 - 用户可以临时覆盖 `Base URL`、`Model`、`API Key`
 - 只要接口兼容 OpenAI Chat Completions，就能接入
+
+If you are using an OpenAI-compatible relay instead of the official OpenAI endpoint, you do not need to pretend it is the original vendor. Set the provider you want, then point `OPENAI_BASE_URL` or `CUSTOM_LLM_BASE_URL` to your relay, and set the matching model name in `OPENAI_MODEL` or `CUSTOM_LLM_MODEL`.
 
 示例 provider 已预置：
 

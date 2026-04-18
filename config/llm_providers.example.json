@@ -4,21 +4,26 @@
     "openai": {
       "label": "OpenAI",
       "base_url": "https://api.openai.com/v1",
+      "base_url_env": "OPENAI_BASE_URL",
       "model": "gpt-4.1-mini",
+      "model_env": "OPENAI_MODEL",
       "api_key_env": "OPENAI_API_KEY"
     },
     "doubao": {
       "label": "Doubao / Volcano Engine",
       "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+      "base_url_env": "DOUBAO_BASE_URL",
       "model": "ep-your-doubao-endpoint",
+      "model_env": "DOUBAO_MODEL",
       "api_key_env": "DOUBAO_API_KEY"
     },
     "custom": {
       "label": "Custom OpenAI Compatible",
       "base_url": "https://your-llm-endpoint.example.com/v1",
+      "base_url_env": "CUSTOM_LLM_BASE_URL",
       "model": "your-model-name",
+      "model_env": "CUSTOM_LLM_MODEL",
       "api_key_env": "CUSTOM_LLM_API_KEY"
     }
   }
 }
-

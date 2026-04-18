@@ -299,8 +299,8 @@
           <details>
             <summary>高级配置：LLM Provider</summary>
             <p class="hint">
-              这里预留了多 Provider 切换能力。默认读取本地 provider 配置，你也可以临时覆盖 Base URL、模型和 API Key，
-              因此不仅能接 OpenAI，也可以接豆包或任意 OpenAI 兼容接口。
+              这里预留了多 Provider 切换能力。默认会读取本地 provider 配置和 `.env` 里的 Base URL、模型、API Key，
+              你也可以临时覆盖它们，因此不仅能接 OpenAI，也可以接豆包或任意 OpenAI 兼容中转接口。
             </p>
             <div class="grid">
               <label>
