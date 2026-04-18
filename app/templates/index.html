@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ app_name }}</title>
+    <style>
+      :root {
+        --bg-top: #f4efe5;
+        --bg-bottom: #dce8f3;
+        --card: rgba(255, 255, 255, 0.88);
+        --card-border: rgba(17, 24, 39, 0.08);
+        --text: #102033;
+        --muted: #5c6b7a;
+        --accent: #0c7d69;
+        --accent-strong: #095e4f;
+        --warn: #c2410c;
+        --danger: #b91c1c;
+        --shadow: 0 24px 60px rgba(16, 32, 51, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "PingFang SC", "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.95), transparent 35%),
+          linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
+      }
+
+      main {
+        width: min(980px, calc(100vw - 32px));
+        margin: 48px auto;
+        display: grid;
+        gap: 20px;
+      }
+
+      .hero,
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        backdrop-filter: blur(14px);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 28px 28px 24px;
+      }
+
+      .eyebrow {
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(32px, 5vw, 54px);
+        line-height: 0.95;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 760px;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      .panel {
+        padding: 24px;
+      }
+
+      form {
+        display: grid;
+        gap: 18px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        font: inherit;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid rgba(16, 32, 51, 0.12);
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.82);
+        color: var(--text);
+        transition: border-color 160ms ease, transform 160ms ease;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: rgba(12, 125, 105, 0.55);
+        transform: translateY(-1px);
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      details {
+        border: 1px dashed rgba(16, 32, 51, 0.14);
+        border-radius: 18px;
+        padding: 14px 16px 18px;
+        background: rgba(255, 255, 255, 0.52);
+      }
+
+      details summary {
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .hint {
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 14px 22px;
+        font-weight: 700;
+        color: white;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        cursor: pointer;
+        transition: transform 140ms ease, box-shadow 140ms ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 28px rgba(12, 125, 105, 0.26);
+      }
+
+      .status {
+        display: grid;
+        gap: 10px;
+      }
+
+      .status-card {
+        border-radius: 18px;
+        padding: 18px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid rgba(16, 32, 51, 0.08);
+      }
+
+      .status-tag {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(12, 125, 105, 0.12);
+        color: var(--accent-strong);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+
+      .status-tag.failed {
+        background: rgba(185, 28, 28, 0.1);
+        color: var(--danger);
+      }
+
+      .status-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        margin-top: 12px;
+      }
+
+      .metric {
+        border-radius: 16px;
+        padding: 14px;
+        background: rgba(12, 125, 105, 0.06);
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 24px;
+        margin-bottom: 4px;
+      }
+
+      .error {
+        color: var(--danger);
+      }
+
+      .grafana-link {
+        color: var(--accent-strong);
+        font-weight: 700;
+      }
+
+      .subtle-box {
+        margin-top: 14px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(12, 125, 105, 0.05);
+      }
+
+      .subtle-box strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .refine-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      button[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      @media (max-width: 760px) {
+        main {
+          margin: 24px auto;
+        }
+
+        .grid,
+        .status-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero,
+        .panel {
+          border-radius: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Keyword Agent To Grafana</div>
+        <h1>Grafinder</h1>
+        <p>
+          输入关键词和展示意图后，Agent 会自动发现网页来源、调用 Crawl4AI 抓取内容、使用可切换的
+          LLM 接口做结构化抽取、写入本地数据库，并自动生成本地 Grafana 面板。
+        </p>
+      </section>
+
+      <section class="panel">
+        <form id="task-form">
+          <div class="grid">
+            <label>
+              关键词
+              <input id="keyword" name="keyword" placeholder="例如：储能电站、比亚迪刀片电池" required />
+            </label>
+            <label>
+              展示意图
+              <select id="intent" name="intent">
+                <option value="趋势分析">趋势分析</option>
+                <option value="排行分析">排行分析</option>
+                <option value="原始明细">原始明细</option>
+                <option value="自动推荐">自动推荐</option>
+              </select>
+            </label>
+          </div>
+
+          <details>
+            <summary>高级配置：LLM Provider</summary>
+            <p class="hint">
+              这里预留了多 Provider 切换能力。默认读取本地 provider 配置，你也可以临时覆盖 Base URL、模型和 API Key，
+              因此不仅能接 OpenAI，也可以接豆包或任意 OpenAI 兼容接口。
+            </p>
+            <div class="grid">
+              <label>
+                Provider
+                <select id="llm-provider" name="llm_provider"></select>
+              </label>
+              <label>
+                Model
+                <input id="llm-model" name="llm_model" placeholder="例如：gpt-4.1-mini / ep-xxxx" />
+              </label>
+              <label>
+                Base URL
+                <input id="llm-base-url" name="llm_base_url" placeholder="https://api.openai.com/v1" />
+              </label>
+              <label>
+                API Key
+                <input id="llm-api-key" name="llm_api_key" type="password" placeholder="留空则读取环境变量" />
+              </label>
+            </div>
+          </details>
+
+          <div class="actions">
+            <button type="submit">开始生成 Grafana 面板</button>
+            <span class="hint">提交后会预先打开一个页签，任务完成时自动跳转到本地 Grafana。</span>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel status">
+        <div class="status-card">
+          <span id="status-tag" class="status-tag">等待任务</span>
+          <h2 id="status-title">准备就绪</h2>
+          <p id="status-text" class="hint">填写关键词后即可启动一次完整的数据发现任务。</p>
+          <div class="status-grid">
+            <div class="metric">
+              <strong id="metric-sources">0</strong>
+              <span>来源</span>
+            </div>
+            <div class="metric">
+              <strong id="metric-docs">0</strong>
+              <span>页面</span>
+            </div>
+            <div class="metric">
+              <strong id="metric-records">0</strong>
+              <span>结构化记录</span>
+            </div>
+            <div class="metric">
+              <strong id="metric-revision">v1</strong>
+              <span>仪表盘版本</span>
+            </div>
+          </div>
+          <p id="dashboard-link-wrap" class="hint"></p>
+          <div id="refinement-note-wrap" class="subtle-box" hidden>
+            <strong>最近一次调整</strong>
+            <span id="refinement-note" class="hint"></span>
+          </div>
+          <p id="error-text" class="error"></p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <form id="refine-form">
+          <label>
+            图表不合适时，继续用自然语言调整
+            <textarea
+              id="refine-instruction"
+              name="instruction"
+              placeholder="例如：不要表格，改成按来源的柱状图；时间趋势按周统计；保留一个核心数值卡片。"
+            ></textarea>
+          </label>
+          <div class="refine-actions">
+            <button id="refine-button" type="submit" disabled>根据反馈重新生成 Grafana 面板</button>
+            <span id="refine-hint" class="hint">先运行一次任务，生成首版 Grafana 面板后即可继续调整。</span>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const providerSelect = document.getElementById("llm-provider");
+      const modelInput = document.getElementById("llm-model");
+      const baseUrlInput = document.getElementById("llm-base-url");
+      const apiKeyInput = document.getElementById("llm-api-key");
+      const statusTag = document.getElementById("status-tag");
+      const statusTitle = document.getElementById("status-title");
+      const statusText = document.getElementById("status-text");
+      const sourcesMetric = document.getElementById("metric-sources");
+      const docsMetric = document.getElementById("metric-docs");
+      const recordsMetric = document.getElementById("metric-records");
+      const revisionMetric = document.getElementById("metric-revision");
+      const dashboardLinkWrap = document.getElementById("dashboard-link-wrap");
+      const errorText = document.getElementById("error-text");
+      const refineForm = document.getElementById("refine-form");
+      const refineButton = document.getElementById("refine-button");
+      const refineHint = document.getElementById("refine-hint");
+      const refineInstruction = document.getElementById("refine-instruction");
+      const refinementNoteWrap = document.getElementById("refinement-note-wrap");
+      const refinementNote = document.getElementById("refinement-note");
+
+      let providerIndex = {};
+      let grafanaWindow = null;
+      let pollTimer = null;
+      let currentTaskId = null;
+
+      async function loadMeta() {
+        const response = await fetch("/api/meta");
+        const meta = await response.json();
+        providerIndex = {};
+        providerSelect.innerHTML = "";
+
+        meta.providers.forEach((provider) => {
+          providerIndex[provider.name] = provider;
+          const option = document.createElement("option");
+          option.value = provider.name;
+          option.textContent = provider.label;
+          if (provider.name === meta.default_provider) {
+            option.selected = true;
+          }
+          providerSelect.appendChild(option);
+        });
+
+        applyProviderDefaults();
+      }
+
+      function applyProviderDefaults() {
+        const provider = providerIndex[providerSelect.value];
+        if (!provider) return;
+        modelInput.value = provider.model || "";
+        baseUrlInput.value = provider.base_url || "";
+      }
+
+      function setStatus(task) {
+        currentTaskId = task.id;
+        const failed = task.status === "failed";
+        statusTag.textContent = task.status;
+        statusTag.className = failed ? "status-tag failed" : "status-tag";
+        statusTitle.textContent = `${task.keyword} / ${task.intent}`;
+        statusText.textContent = task.summary || "任务执行中...";
+        sourcesMetric.textContent = task.sources_count ?? 0;
+        docsMetric.textContent = task.documents_count ?? 0;
+        recordsMetric.textContent = task.records_count ?? 0;
+        revisionMetric.textContent = `v${task.dashboard_revision ?? 1}`;
+        errorText.textContent = task.error_message || "";
+        refineButton.disabled = !task.id || task.status === "running" || task.records_count === 0;
+        refineHint.textContent =
+          task.records_count > 0
+            ? "直接描述你想怎么改图，Grafinder 会基于已入库数据重建同一个 Grafana Dashboard。"
+            : "先跑出一批结构化数据后，才能根据反馈重新生成图表。";
+        if (task.dashboard_url) {
+          dashboardLinkWrap.innerHTML = `<a class="grafana-link" href="${task.dashboard_url}" target="_blank" rel="noreferrer">打开 Grafana 面板</a>`;
+        } else {
+          dashboardLinkWrap.textContent = "";
+        }
+        if (task.last_refinement_instruction) {
+          refinementNoteWrap.hidden = false;
+          refinementNote.textContent = task.last_refinement_instruction;
+        } else {
+          refinementNoteWrap.hidden = true;
+          refinementNote.textContent = "";
+        }
+      }
+
+      async function pollTask(taskId) {
+        const response = await fetch(`/api/tasks/${taskId}`);
+        const task = await response.json();
+        setStatus(task);
+
+        if (task.status === "completed") {
+          clearInterval(pollTimer);
+          if (grafanaWindow && task.dashboard_url) {
+            grafanaWindow.location = task.dashboard_url;
+            grafanaWindow.focus();
+          }
+          return;
+        }
+
+        if (task.status === "failed") {
+          clearInterval(pollTimer);
+          if (grafanaWindow && !grafanaWindow.closed) {
+            grafanaWindow.document.body.innerHTML =
+              `<div style="font-family: sans-serif; padding: 24px;"><h2>任务失败</h2><p>${task.error_message || "Unknown error"}</p></div>`;
+          }
+        }
+      }
+
+      providerSelect.addEventListener("change", applyProviderDefaults);
+
+      document.getElementById("task-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearInterval(pollTimer);
+        currentTaskId = null;
+        grafanaWindow = window.open("", "_blank");
+        if (grafanaWindow) {
+          grafanaWindow.document.write(
+            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 面板生成中</h2><p>Agent 正在搜索来源、抓取网页、抽取结构化数据并构建本地 Grafana Dashboard。</p></div>"
+          );
+        }
+
+        statusTag.className = "status-tag";
+        statusTag.textContent = "submitting";
+        statusTitle.textContent = "任务已提交";
+        statusText.textContent = "正在创建任务...";
+        dashboardLinkWrap.textContent = "";
+        errorText.textContent = "";
+
+        const payload = {
+          keyword: document.getElementById("keyword").value,
+          intent: document.getElementById("intent").value,
+          llm_provider: providerSelect.value || null,
+          llm_model: modelInput.value || null,
+          llm_base_url: baseUrlInput.value || null,
+          llm_api_key: apiKeyInput.value || null,
+        };
+
+        const response = await fetch("/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const detail = await response.json();
+          statusTag.textContent = "failed";
+          statusTag.className = "status-tag failed";
+          statusTitle.textContent = "任务创建失败";
+          statusText.textContent = "请检查 Provider 配置后重试。";
+          errorText.textContent = detail.detail || "Unknown error";
+          if (grafanaWindow && !grafanaWindow.closed) {
+            grafanaWindow.close();
+          }
+          return;
+        }
+
+        const task = await response.json();
+        setStatus(task);
+        pollTimer = setInterval(() => {
+          pollTask(task.id).catch((error) => {
+            clearInterval(pollTimer);
+            errorText.textContent = error.message;
+          });
+        }, 3000);
+      });
+
+      refineForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!currentTaskId) {
+          errorText.textContent = "请先创建并完成一个任务。";
+          return;
+        }
+
+        const instruction = refineInstruction.value.trim();
+        if (!instruction) {
+          errorText.textContent = "请输入你希望如何调整图表。";
+          return;
+        }
+
+        clearInterval(pollTimer);
+        if (!grafanaWindow || grafanaWindow.closed) {
+          grafanaWindow = window.open("", "_blank");
+        }
+        if (grafanaWindow) {
+          grafanaWindow.document.write(
+            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 面板调整中</h2><p>Agent 正在根据你的自然语言反馈，基于当前数据库里的结果重新设计 Grafana 图表。</p></div>"
+          );
+        }
+
+        errorText.textContent = "";
+        refineButton.disabled = true;
+        statusTag.className = "status-tag";
+        statusTag.textContent = "running";
+        statusText.textContent = "正在根据反馈重新生成 Grafana 面板...";
+
+        const payload = {
+          instruction,
+          llm_provider: providerSelect.value || null,
+          llm_model: modelInput.value || null,
+          llm_base_url: baseUrlInput.value || null,
+          llm_api_key: apiKeyInput.value || null,
+        };
+
+        const response = await fetch(`/api/tasks/${currentTaskId}/refine`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const detail = await response.json();
+          refineButton.disabled = false;
+          errorText.textContent = detail.detail || "无法重新生成 Grafana 面板。";
+          return;
+        }
+
+        const task = await response.json();
+        setStatus(task);
+        pollTimer = setInterval(() => {
+          pollTask(task.id).catch((error) => {
+            clearInterval(pollTimer);
+            errorText.textContent = error.message;
+          });
+        }, 3000);
+      });
+
+      loadMeta().catch((error) => {
+        errorText.textContent = error.message;
+      });
+    </script>
+  </body>
+</html>

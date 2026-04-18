@@ -1,0 +1,2 @@
+[console_scripts]
+grafinder = app.__main__:main

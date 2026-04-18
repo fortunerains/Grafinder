@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: grafinder-postgres
+    environment:
+      POSTGRES_DB: grafinder
+      POSTGRES_USER: grafinder
+      POSTGRES_PASSWORD: grafinder
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grafinder -d grafinder"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  grafana:
+    image: grafana/grafana:11.1.4
+    container_name: grafinder-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: grafinder_admin
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+    container_name: grafinder-app
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      grafana:
+        condition: service_started
+    volumes:
+      - ./config:/app/config:ro
+
+volumes:
+  postgres_data:
+  grafana_data:

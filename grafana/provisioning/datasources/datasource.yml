@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: Grafinder Postgres
+    uid: grafinder-postgres
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    user: grafinder
+    secureJsonData:
+      password: grafinder
+    jsonData:
+      database: grafinder
+      postgresVersion: 1600
+      sslmode: disable
+      timescaledb: false
+
