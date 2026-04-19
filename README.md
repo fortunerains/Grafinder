@@ -1,6 +1,6 @@
 # Grafinder
 
-Chinese version: [README.zh-CN.md](/Users/xiaoyu/code/Grafinder/README.zh-CN.md)
+Chinese version: [README.zh-CN.md](./README.zh-CN.md)
 
 Grafinder is a local keyword-driven analysis agent. A user enters a keyword and a display intent in a local web page, and the system automatically discovers sources, crawls pages with Crawl4AI, extracts structured data through a selectable LLM API, stores the results in local PostgreSQL, and generates dashboards and panels in local Grafana.
 
