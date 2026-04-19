@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     max_documents_per_task: int = 5
     crawl_timeout_seconds: int = 45
     crawl_max_markdown_chars: int = 12_000
-    network_timeout_seconds: int = 30
+    network_timeout_seconds: int = 60
     http_proxy: str | None = None
     https_proxy: str | None = None
     all_proxy: str | None = None
@@ -56,6 +56,9 @@ class Settings(BaseSettings):
         if self.https_proxy:
             os.environ["HTTPS_PROXY"] = self.https_proxy
             os.environ["https_proxy"] = self.https_proxy
+        if self.all_proxy:
+            os.environ["ALL_PROXY"] = self.all_proxy
+            os.environ["all_proxy"] = self.all_proxy
         if self.no_proxy:
             os.environ["NO_PROXY"] = self.no_proxy
             os.environ["no_proxy"] = self.no_proxy

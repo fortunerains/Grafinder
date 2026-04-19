@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from json import JSONDecodeError
+from time import perf_counter
 from typing import Any
 
 import httpx
@@ -137,7 +139,7 @@ class OpenAICompatibleChatAdapter:
         try:
             if runtime.json_mode != "prompt_only":
                 try:
-                    content = await self._create_completion(
+                    content = await self._create_completion_with_timeout(
                         client,
                         runtime=runtime,
                         system_prompt=system_prompt,
@@ -153,7 +155,7 @@ class OpenAICompatibleChatAdapter:
                     if runtime.json_mode == "response_format":
                         raise
 
-            content = await self._create_completion(
+            content = await self._create_completion_with_timeout(
                 client,
                 runtime=runtime,
                 system_prompt=system_prompt,
@@ -164,6 +166,66 @@ class OpenAICompatibleChatAdapter:
             return _extract_json_payload(content)
         finally:
             await client.close()
+
+    async def test_connection(self, runtime: LLMRuntimeConfig) -> dict[str, Any]:
+        http_client_kwargs: dict[str, Any] = {
+            "timeout": min(max(float(self.settings.network_timeout_seconds), 10.0), 20.0),
+            "trust_env": False,
+        }
+        if self.settings.preferred_proxy:
+            http_client_kwargs["proxy"] = self.settings.preferred_proxy
+
+        http_client = httpx.AsyncClient(**http_client_kwargs)
+        client = AsyncOpenAI(
+            api_key=runtime.api_key,
+            base_url=runtime.base_url,
+            http_client=http_client,
+        )
+        started_at = perf_counter()
+        try:
+            response = await asyncio.wait_for(
+                client.chat.completions.create(
+                    model=runtime.model,
+                    temperature=0,
+                    messages=[
+                        {"role": "system", "content": "You are a connectivity checker. Reply briefly."},
+                        {"role": "user", "content": "Reply with a short confirmation that this model is reachable."},
+                    ],
+                ),
+                timeout=min(max(float(self.settings.network_timeout_seconds), 10.0), 20.0) + 5.0,
+            )
+            message = _content_to_text(response.choices[0].message.content).strip() or "Connection OK."
+            return {
+                "latency_ms": int((perf_counter() - started_at) * 1000),
+                "message": message[:200],
+            }
+        finally:
+            await client.close()
+
+    async def _create_completion_with_timeout(
+        self,
+        client: AsyncOpenAI,
+        runtime: LLMRuntimeConfig,
+        system_prompt: str,
+        user_prompt: str,
+        temperature: float,
+        use_response_format: bool,
+    ) -> str:
+        timeout_seconds = min(max(float(self.settings.network_timeout_seconds), 30.0) + 15.0, 75.0)
+        try:
+            return await asyncio.wait_for(
+                self._create_completion(
+                    client,
+                    runtime=runtime,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    temperature=temperature,
+                    use_response_format=use_response_format,
+                ),
+                timeout=timeout_seconds,
+            )
+        except asyncio.TimeoutError as exc:
+            raise RuntimeError(f"LLM request timed out after {int(timeout_seconds)} seconds.") from exc
 
     @staticmethod
     async def _create_completion(
@@ -208,3 +270,13 @@ class LLMJsonClient:
         if not adapter:
             raise RuntimeError(f"Provider '{runtime.provider}' uses unsupported adapter '{runtime.adapter}'.")
         return await adapter.complete_json(runtime, system_prompt, user_prompt, temperature)
+
+    async def test_connection(self, runtime: LLMRuntimeConfig) -> dict[str, Any]:
+        if not runtime.api_key:
+            raise RuntimeError(f"Provider '{runtime.provider}' does not have a usable API key.")
+        adapter = self._adapters.get(runtime.adapter)
+        if not adapter:
+            raise RuntimeError(f"Provider '{runtime.provider}' uses unsupported adapter '{runtime.adapter}'.")
+        if not hasattr(adapter, "test_connection"):
+            raise RuntimeError(f"Provider '{runtime.provider}' does not support connection testing.")
+        return await adapter.test_connection(runtime)

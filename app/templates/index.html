@@ -6,17 +6,17 @@
     <title>{{ app_name }}</title>
     <style>
       :root {
-        --bg-top: #f4efe5;
-        --bg-bottom: #dce8f3;
-        --card: rgba(255, 255, 255, 0.88);
-        --card-border: rgba(17, 24, 39, 0.08);
-        --text: #102033;
-        --muted: #5c6b7a;
-        --accent: #0c7d69;
-        --accent-strong: #095e4f;
-        --warn: #c2410c;
-        --danger: #b91c1c;
-        --shadow: 0 24px 60px rgba(16, 32, 51, 0.14);
+        --bg-top: #efe6d7;
+        --bg-bottom: #d7e6ee;
+        --ink: #112132;
+        --muted: #5b6c7c;
+        --card: rgba(255, 255, 255, 0.86);
+        --line: rgba(17, 33, 50, 0.09);
+        --accent: #0b7a67;
+        --accent-deep: #08584c;
+        --danger: #b42318;
+        --chip: rgba(11, 122, 103, 0.09);
+        --shadow: 0 24px 64px rgba(17, 33, 50, 0.14);
       }
 
       * {
@@ -27,55 +27,124 @@
         margin: 0;
         min-height: 100vh;
         font-family: "Avenir Next", "PingFang SC", "Segoe UI", sans-serif;
-        color: var(--text);
+        color: var(--ink);
         background:
-          radial-gradient(circle at top left, rgba(255, 255, 255, 0.95), transparent 35%),
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 32%),
           linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
       }
 
       main {
-        width: min(980px, calc(100vw - 32px));
-        margin: 48px auto;
+        width: min(1080px, calc(100vw - 32px));
+        margin: 32px auto 48px;
         display: grid;
         gap: 20px;
       }
 
-      .hero,
-      .panel {
+      .card {
         background: var(--card);
-        border: 1px solid var(--card-border);
+        border: 1px solid var(--line);
         border-radius: 24px;
-        backdrop-filter: blur(14px);
         box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
       }
 
       .hero {
-        padding: 28px 28px 24px;
+        padding: 24px 26px;
+      }
+
+      .hero-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
       }
 
       .eyebrow {
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
         font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
         color: var(--accent);
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
 
       h1 {
-        margin: 0 0 12px;
-        font-size: clamp(32px, 5vw, 54px);
-        line-height: 0.95;
+        margin: 0;
+        font-size: clamp(34px, 5vw, 56px);
+        line-height: 0.94;
       }
 
       .hero p {
-        margin: 0;
+        margin: 12px 0 0;
         max-width: 760px;
-        line-height: 1.7;
         color: var(--muted);
+        line-height: 1.75;
       }
 
-      .panel {
+      .hero-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .ghost-button,
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      .ghost-button,
+      button {
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+      }
+
+      button {
+        padding: 14px 22px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+        color: white;
+        font-weight: 700;
+      }
+
+      .ghost-button {
+        padding: 12px 18px;
+        background: rgba(17, 33, 50, 0.05);
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      button:hover,
+      .ghost-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 26px rgba(17, 33, 50, 0.12);
+      }
+
+      button[disabled],
+      .ghost-button[disabled] {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .section {
         padding: 24px;
+      }
+
+      .section-title {
+        margin: 0 0 14px;
+        font-size: 22px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
       }
 
       form {
@@ -85,42 +154,34 @@
 
       .grid {
         display: grid;
-        gap: 16px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
       }
 
       label {
         display: grid;
         gap: 8px;
         font-size: 14px;
-        font-weight: 600;
-      }
-
-      input,
-      select,
-      textarea,
-      button {
-        font: inherit;
+        font-weight: 700;
       }
 
       input,
       select,
       textarea {
         width: 100%;
-        border-radius: 16px;
-        border: 1px solid rgba(16, 32, 51, 0.12);
+        border-radius: 18px;
+        border: 1px solid rgba(17, 33, 50, 0.12);
         padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.82);
-        color: var(--text);
-        transition: border-color 160ms ease, transform 160ms ease;
+        background: rgba(255, 255, 255, 0.88);
+        color: var(--ink);
       }
 
       input:focus,
       select:focus,
       textarea:focus {
         outline: none;
-        border-color: rgba(12, 125, 105, 0.55);
-        transform: translateY(-1px);
+        border-color: rgba(11, 122, 103, 0.42);
+        box-shadow: 0 0 0 4px rgba(11, 122, 103, 0.08);
       }
 
       textarea {
@@ -128,107 +189,214 @@
         resize: vertical;
       }
 
-      details {
-        border: 1px dashed rgba(16, 32, 51, 0.14);
-        border-radius: 18px;
-        padding: 14px 16px 18px;
-        background: rgba(255, 255, 255, 0.52);
-      }
-
-      details summary {
-        cursor: pointer;
-        font-weight: 700;
-      }
-
-      .hint {
-        font-size: 13px;
-        line-height: 1.6;
-        color: var(--muted);
-      }
-
       .actions {
         display: flex;
         gap: 12px;
         align-items: center;
+        flex-wrap: wrap;
       }
 
-      button {
-        border: none;
-        border-radius: 999px;
-        padding: 14px 22px;
-        font-weight: 700;
-        color: white;
-        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-        cursor: pointer;
-        transition: transform 140ms ease, box-shadow 140ms ease;
-      }
-
-      button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 16px 28px rgba(12, 125, 105, 0.26);
-      }
-
-      .status {
+      .status-wrap {
         display: grid;
-        gap: 10px;
+        gap: 14px;
       }
 
-      .status-card {
-        border-radius: 18px;
-        padding: 18px;
-        background: rgba(255, 255, 255, 0.78);
-        border: 1px solid rgba(16, 32, 51, 0.08);
+      .status-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: flex-start;
       }
 
       .status-tag {
         display: inline-flex;
+        align-items: center;
+        gap: 6px;
         padding: 6px 10px;
         border-radius: 999px;
-        background: rgba(12, 125, 105, 0.12);
-        color: var(--accent-strong);
+        background: var(--chip);
+        color: var(--accent-deep);
         font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.03em;
+        font-weight: 800;
+        letter-spacing: 0.04em;
       }
 
       .status-tag.failed {
-        background: rgba(185, 28, 28, 0.1);
+        background: rgba(180, 35, 24, 0.1);
         color: var(--danger);
       }
 
-      .status-grid {
+      .status-title {
+        margin: 12px 0 8px;
+        font-size: 36px;
+        line-height: 1.08;
+      }
+
+      .metrics {
         display: grid;
-        gap: 12px;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        margin-top: 12px;
+        gap: 12px;
       }
 
       .metric {
-        border-radius: 16px;
-        padding: 14px;
-        background: rgba(12, 125, 105, 0.06);
+        border-radius: 18px;
+        padding: 16px;
+        background: rgba(11, 122, 103, 0.06);
       }
 
       .metric strong {
         display: block;
-        font-size: 24px;
+        font-size: 30px;
         margin-bottom: 4px;
+      }
+
+      .status-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .grafana-link {
+        color: var(--accent-deep);
+        font-weight: 700;
+      }
+
+      .data-note {
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: rgba(11, 122, 103, 0.06);
       }
 
       .error {
         color: var(--danger);
       }
 
-      .grafana-link {
-        color: var(--accent-strong);
+      dialog {
+        width: min(760px, calc(100vw - 24px));
+        border: none;
+        border-radius: 24px;
+        padding: 0;
+        box-shadow: 0 32px 80px rgba(17, 33, 50, 0.24);
+        background: rgba(250, 252, 252, 0.98);
+      }
+
+      dialog::backdrop {
+        background: rgba(17, 33, 50, 0.32);
+        backdrop-filter: blur(6px);
+      }
+
+      .dialog-shell {
+        padding: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .dialog-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .dialog-head h3 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .close-button {
+        border: none;
+        background: rgba(17, 33, 50, 0.06);
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .source-list {
+        display: grid;
+        gap: 12px;
+        max-height: 64vh;
+        overflow: auto;
+      }
+
+      .source-item {
+        border: 1px solid rgba(17, 33, 50, 0.09);
+        border-radius: 18px;
+        padding: 16px;
+        background: white;
+        display: grid;
+        gap: 10px;
+      }
+
+      .source-item h4 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .source-meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(17, 33, 50, 0.06);
+        font-size: 12px;
         font-weight: 700;
       }
 
+      .source-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .settings-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dialog-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .dialog-button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .settings-note {
+        min-height: 20px;
+      }
+
+      .settings-note.saved {
+        color: var(--accent-deep);
+      }
+
+      .settings-note.error {
+        color: var(--danger);
+      }
+
+      .refine-wrap {
+        display: grid;
+        gap: 12px;
+      }
+
       .subtle-box {
-        margin-top: 14px;
         padding: 14px 16px;
         border-radius: 16px;
-        background: rgba(12, 125, 105, 0.05);
+        background: rgba(11, 122, 103, 0.05);
       }
 
       .subtle-box strong {
@@ -236,54 +404,53 @@
         margin-bottom: 6px;
       }
 
-      .refine-actions {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      button[disabled] {
-        opacity: 0.6;
-        cursor: not-allowed;
-        box-shadow: none;
-        transform: none;
-      }
-
-      @media (max-width: 760px) {
+      @media (max-width: 820px) {
         main {
-          margin: 24px auto;
+          width: min(100vw - 20px, 1080px);
+          margin-top: 20px;
+        }
+
+        .hero-head,
+        .status-top {
+          flex-direction: column;
         }
 
         .grid,
-        .status-grid {
+        .metrics,
+        .settings-grid {
           grid-template-columns: 1fr;
         }
 
-        .hero,
-        .panel {
-          border-radius: 20px;
+        .hero-actions {
+          justify-content: flex-start;
         }
       }
     </style>
   </head>
   <body>
     <main>
-      <section class="hero">
-        <div class="eyebrow">Keyword Agent To Grafana</div>
-        <h1>Grafinder</h1>
-        <p>
-          输入关键词和展示意图后，Agent 会自动发现网页来源、调用 Crawl4AI 抓取内容、使用可切换的
-          LLM 接口做结构化抽取、写入本地数据库，并自动生成本地 Grafana 面板。
-        </p>
+      <section class="card hero">
+        <div class="hero-head">
+          <div>
+            <div class="eyebrow">Local Keyword Analysis To Grafana</div>
+            <h1>Grafinder</h1>
+            <p>
+              先找到直接网页来源，再抓取正文与结构化数据，最后把“当前状态、变化趋势、数据明细、来源说明”做成一套 Grafana 分析看板。
+            </p>
+          </div>
+          <div class="hero-actions">
+            <button id="open-settings" class="ghost-button" type="button">Settings</button>
+          </div>
+        </div>
       </section>
 
-      <section class="panel">
+      <section class="card section">
+        <h2 class="section-title">创建分析任务</h2>
         <form id="task-form">
           <div class="grid">
             <label>
               关键词
-              <input id="keyword" name="keyword" placeholder="例如：储能电站、比亚迪刀片电池" required />
+              <input id="keyword" name="keyword" placeholder="例如：锂电池 国内 价格、lithium battery price" required />
             </label>
             <label>
               展示意图
@@ -295,94 +462,139 @@
               </select>
             </label>
           </div>
-
-          <details>
-            <summary>高级配置：LLM Provider</summary>
-            <p class="hint">
-              这里预留了多 Provider 切换能力。默认会读取本地 provider 配置和 `.env` 里的 Base URL、模型、API Key，
-              你也可以临时覆盖它们，因此不仅能接 OpenAI，也可以接豆包或任意 OpenAI 兼容中转接口。
-            </p>
-            <p id="provider-note" class="hint"></p>
-            <div class="grid">
-              <label>
-                Provider
-                <select id="llm-provider" name="llm_provider"></select>
-              </label>
-              <label>
-                模型预设
-                <select id="llm-model-preset" name="llm_model_preset"></select>
-              </label>
-              <label>
-                Model
-                <input id="llm-model" name="llm_model" placeholder="可直接选择预设，也可以手动输入，例如：gpt-5.4 / claude-sonnet-4-20250514" />
-              </label>
-              <label>
-                Base URL
-                <input id="llm-base-url" name="llm_base_url" placeholder="https://api.openai.com/v1" />
-              </label>
-              <label>
-                API Key
-                <input id="llm-api-key" name="llm_api_key" type="password" placeholder="可直接复制粘贴，留空则读取环境变量" />
-              </label>
-            </div>
-          </details>
-
+          <label>
+            来源偏好 / 抓取提示
+            <textarea
+              id="source-hint"
+              name="source_hint"
+              placeholder="可选。用自然语言告诉 Agent 更偏向哪些网站或来源，例如：优先 Mysteel、东方财富、工信部、SMM，不要新闻站；如果有行业月报也可以抓。"
+            ></textarea>
+          </label>
           <div class="actions">
-            <button type="submit">开始生成 Grafana 面板</button>
-            <span class="hint">提交后会预先打开一个页签，任务完成时自动跳转到本地 Grafana。</span>
+            <button type="submit">开始生成 Grafana 分析看板</button>
+            <span class="hint">提交后会新开一个页签，任务完成后自动跳到本地 Grafana。</span>
           </div>
         </form>
       </section>
 
-      <section class="panel status">
-        <div class="status-card">
-          <span id="status-tag" class="status-tag">等待任务</span>
-          <h2 id="status-title">准备就绪</h2>
-          <p id="status-text" class="hint">填写关键词后即可启动一次完整的数据发现任务。</p>
-          <div class="status-grid">
-            <div class="metric">
-              <strong id="metric-sources">0</strong>
-              <span>来源</span>
-            </div>
-            <div class="metric">
-              <strong id="metric-docs">0</strong>
-              <span>页面</span>
-            </div>
-            <div class="metric">
-              <strong id="metric-records">0</strong>
-              <span>结构化记录</span>
-            </div>
-            <div class="metric">
-              <strong id="metric-revision">v1</strong>
-              <span>仪表盘版本</span>
-            </div>
+      <section class="card section status-wrap">
+        <div class="status-top">
+          <div>
+            <span id="status-tag" class="status-tag">等待任务</span>
+            <h2 id="status-title" class="status-title">准备就绪</h2>
+            <p id="status-text" class="hint">输入关键词后即可启动一次完整的数据分析任务。</p>
           </div>
-          <p id="dashboard-link-wrap" class="hint"></p>
-          <div id="refinement-note-wrap" class="subtle-box" hidden>
-            <strong>最近一次调整</strong>
-            <span id="refinement-note" class="hint"></span>
+          <div class="status-actions">
+            <span id="dashboard-link-wrap" class="hint"></span>
+            <button id="view-sources" class="ghost-button" type="button" disabled>查看抓取来源</button>
           </div>
-          <p id="error-text" class="error"></p>
         </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <strong id="metric-sources">0</strong>
+            <span>来源</span>
+          </div>
+          <div class="metric">
+            <strong id="metric-docs">0</strong>
+            <span>页面</span>
+          </div>
+          <div class="metric">
+            <strong id="metric-records">0</strong>
+            <span>结构化记录</span>
+          </div>
+          <div class="metric">
+            <strong id="metric-revision">v1</strong>
+            <span>仪表盘版本</span>
+          </div>
+        </div>
+
+        <div id="data-note" class="data-note hint">
+          当前看板会优先尝试展示直接数值、变化趋势、来源和明细。如果可分析的数值点不足，会明确提示数据质量。
+        </div>
+
+        <div id="refinement-note-wrap" class="subtle-box" hidden>
+          <strong>最近一次调整</strong>
+          <span id="refinement-note" class="hint"></span>
+        </div>
+
+        <p id="error-text" class="error"></p>
       </section>
 
-      <section class="panel">
+      <section class="card section refine-wrap">
+        <h2 class="section-title">继续调整看板</h2>
         <form id="refine-form">
           <label>
             图表不合适时，继续用自然语言调整
             <textarea
               id="refine-instruction"
               name="instruction"
-              placeholder="例如：不要表格，改成按来源的柱状图；时间趋势按周统计；保留一个核心数值卡片。"
+              placeholder="例如：把当前状态放在左上角；趋势只保留价格相关数值；不要来源分布，改成最近 30 条明细。"
             ></textarea>
           </label>
-          <div class="refine-actions">
+          <div class="actions">
             <button id="refine-button" type="submit" disabled>根据反馈重新生成 Grafana 面板</button>
-            <span id="refine-hint" class="hint">先运行一次任务，生成首版 Grafana 面板后即可继续调整。</span>
+            <span id="refine-hint" class="hint">先跑出一批结构化数据后，才能根据反馈重新生成图表。</span>
           </div>
         </form>
       </section>
     </main>
+
+    <dialog id="settings-dialog">
+      <div class="dialog-shell">
+        <div class="dialog-head">
+          <div>
+            <h3>LLM Settings</h3>
+            <p class="hint">这里放 Provider、Model、Base URL、API Key。页面主区只保留任务输入。</p>
+          </div>
+          <button class="close-button" type="button" data-close-dialog="settings-dialog">关闭</button>
+        </div>
+        <div class="settings-grid">
+          <label>
+            Provider
+            <select id="llm-provider" name="llm_provider"></select>
+          </label>
+          <label>
+            模型预设
+            <select id="llm-model-preset" name="llm_model_preset"></select>
+          </label>
+          <label>
+            Model
+            <input id="llm-model" name="llm_model" placeholder="例如：gpt-5.4 / claude-sonnet-4-20250514" />
+          </label>
+          <label>
+            Base URL
+            <input id="llm-base-url" name="llm_base_url" placeholder="https://api.openai.com/v1" />
+          </label>
+          <label style="grid-column: 1 / -1;">
+            API Key
+            <input id="llm-api-key" name="llm_api_key" type="password" placeholder="可直接复制粘贴，留空则读取环境变量" />
+          </label>
+        </div>
+        <p id="provider-note" class="hint"></p>
+        <div class="dialog-actions">
+          <div class="dialog-button-group">
+            <button id="test-settings" class="ghost-button" type="button">测试连接</button>
+            <button id="save-settings" type="button">保存设置</button>
+            <button id="clear-settings" class="ghost-button" type="button">清空已保存</button>
+          </div>
+          <span id="settings-save-note" class="hint settings-note">可保存到当前浏览器，本机下次打开会自动恢复。</span>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="sources-dialog">
+      <div class="dialog-shell">
+        <div class="dialog-head">
+          <div>
+            <h3>抓取来源</h3>
+            <p id="sources-summary" class="hint">这里会列出当前任务发现并抓取过的网页来源。</p>
+          </div>
+          <button class="close-button" type="button" data-close-dialog="sources-dialog">关闭</button>
+        </div>
+        <div id="source-list" class="source-list"></div>
+      </div>
+    </dialog>
 
     <script>
       const providerSelect = document.getElementById("llm-provider");
@@ -391,6 +603,11 @@
       const baseUrlInput = document.getElementById("llm-base-url");
       const apiKeyInput = document.getElementById("llm-api-key");
       const providerNote = document.getElementById("provider-note");
+      const testSettingsButton = document.getElementById("test-settings");
+      const saveSettingsButton = document.getElementById("save-settings");
+      const clearSettingsButton = document.getElementById("clear-settings");
+      const settingsSaveNote = document.getElementById("settings-save-note");
+
       const statusTag = document.getElementById("status-tag");
       const statusTitle = document.getElementById("status-title");
       const statusText = document.getElementById("status-text");
@@ -400,6 +617,8 @@
       const revisionMetric = document.getElementById("metric-revision");
       const dashboardLinkWrap = document.getElementById("dashboard-link-wrap");
       const errorText = document.getElementById("error-text");
+      const dataNote = document.getElementById("data-note");
+
       const refineForm = document.getElementById("refine-form");
       const refineButton = document.getElementById("refine-button");
       const refineHint = document.getElementById("refine-hint");
@@ -407,10 +626,31 @@
       const refinementNoteWrap = document.getElementById("refinement-note-wrap");
       const refinementNote = document.getElementById("refinement-note");
 
+      const settingsDialog = document.getElementById("settings-dialog");
+      const sourcesDialog = document.getElementById("sources-dialog");
+      const sourcesButton = document.getElementById("view-sources");
+      const sourceList = document.getElementById("source-list");
+      const sourcesSummary = document.getElementById("sources-summary");
+
       let providerIndex = {};
       let grafanaWindow = null;
       let pollTimer = null;
       let currentTaskId = null;
+      let currentTask = null;
+      const llmSettingsStorageKey = "grafinder.llmSettings.v1";
+
+      function openDialog(dialog) {
+        if (typeof dialog.showModal === "function") {
+          dialog.showModal();
+        }
+      }
+
+      function closeDialogById(id) {
+        const dialog = document.getElementById(id);
+        if (dialog && typeof dialog.close === "function") {
+          dialog.close();
+        }
+      }
 
       async function loadMeta() {
         const response = await fetch("/api/meta");
@@ -430,11 +670,13 @@
         });
 
         applyProviderDefaults();
+        loadSavedSettings();
       }
 
       function applyProviderDefaults() {
         const provider = providerIndex[providerSelect.value];
         if (!provider) return;
+
         modelPresetSelect.innerHTML = "";
         const modelOptions = Array.isArray(provider.model_options) ? provider.model_options : [];
         const mergedOptions = Array.from(new Set([provider.model, ...modelOptions].filter(Boolean)));
@@ -451,9 +693,134 @@
         customOption.value = "__custom__";
         customOption.textContent = "手动输入模型";
         modelPresetSelect.appendChild(customOption);
+
         modelInput.value = provider.model || "";
         baseUrlInput.value = provider.base_url || "";
         providerNote.textContent = provider.description || "";
+      }
+
+      function setSettingsSaveNote(message, state = "default") {
+        settingsSaveNote.textContent = message;
+        settingsSaveNote.className = `hint settings-note${state !== "default" ? ` ${state}` : ""}`;
+      }
+
+      function readSavedSettings() {
+        try {
+          const raw = window.localStorage.getItem(llmSettingsStorageKey);
+          return raw ? JSON.parse(raw) : null;
+        } catch (error) {
+          setSettingsSaveNote("浏览器本地保存不可用，请直接使用当前页面设置。", "error");
+          return null;
+        }
+      }
+
+      function currentSettingsPayload() {
+        return {
+          provider: providerSelect.value || null,
+          model_preset: modelPresetSelect.value || null,
+          model: modelInput.value.trim() || null,
+          base_url: baseUrlInput.value.trim() || null,
+          api_key: apiKeyInput.value || "",
+        };
+      }
+
+      function applySavedSettings(saved) {
+        if (!saved || typeof saved !== "object") return;
+
+        if (saved.provider && providerIndex[saved.provider]) {
+          providerSelect.value = saved.provider;
+        }
+        applyProviderDefaults();
+
+        if (saved.model) {
+          modelInput.value = saved.model;
+        }
+        if (saved.base_url) {
+          baseUrlInput.value = saved.base_url;
+        }
+        if (typeof saved.api_key === "string") {
+          apiKeyInput.value = saved.api_key;
+        }
+
+        const optionValues = Array.from(modelPresetSelect.options).map((option) => option.value);
+        if (saved.model_preset && optionValues.includes(saved.model_preset)) {
+          modelPresetSelect.value = saved.model_preset;
+        } else {
+          syncModelPreset();
+        }
+      }
+
+      function loadSavedSettings() {
+        const saved = readSavedSettings();
+        if (!saved) {
+          setSettingsSaveNote("可保存到当前浏览器，本机下次打开会自动恢复。", "default");
+          return;
+        }
+        applySavedSettings(saved);
+        setSettingsSaveNote("已自动加载上次保存的 LLM 设置。公共电脑请不要保存 API Key。", "saved");
+      }
+
+      function saveSettings() {
+        try {
+          window.localStorage.setItem(llmSettingsStorageKey, JSON.stringify(currentSettingsPayload()));
+          setSettingsSaveNote("已保存到当前浏览器。刷新页面后也会自动恢复。", "saved");
+        } catch (error) {
+          setSettingsSaveNote("保存失败：浏览器不允许写入本地存储。", "error");
+        }
+      }
+
+      function clearSavedSettings() {
+        try {
+          window.localStorage.removeItem(llmSettingsStorageKey);
+        } catch (error) {
+          setSettingsSaveNote("清空失败：浏览器不允许操作本地存储。", "error");
+          return;
+        }
+
+        applyProviderDefaults();
+        apiKeyInput.value = "";
+        syncModelPreset();
+        setSettingsSaveNote("已清空浏览器里保存的 LLM 设置。当前已恢复为默认值。", "saved");
+      }
+
+      function markSettingsDirty() {
+        setSettingsSaveNote("当前修改尚未保存到浏览器。点击“保存设置”后才会在下次自动恢复。", "default");
+      }
+
+      async function testSettingsConnection() {
+        const payload = {
+          llm_provider: providerSelect.value || null,
+          llm_model: modelInput.value || null,
+          llm_base_url: baseUrlInput.value || null,
+          llm_api_key: apiKeyInput.value || null,
+        };
+
+        testSettingsButton.disabled = true;
+        setSettingsSaveNote("正在测试当前 LLM 设置连通性...", "default");
+
+        try {
+          const response = await fetch("/api/llm/test", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+            const detail = result?.detail || "连接测试失败。";
+            setSettingsSaveNote(`测试失败：${detail}`, "error");
+            return;
+          }
+
+          setSettingsSaveNote(
+            `连接成功：${result.provider} / ${result.model}，耗时 ${result.latency_ms} ms。${result.message} 如需下次自动恢复，请再点“保存设置”。`,
+            "saved",
+          );
+        } catch (error) {
+          setSettingsSaveNote(`测试失败：${error.message}`, "error");
+        } finally {
+          testSettingsButton.disabled = false;
+        }
       }
 
       function syncModelPreset() {
@@ -462,8 +829,30 @@
         modelPresetSelect.value = options.includes(currentModel) ? currentModel : "__custom__";
       }
 
+      function renderDashboardLink(task) {
+        if (task.dashboard_url) {
+          dashboardLinkWrap.innerHTML = `<a class="grafana-link" href="${task.dashboard_url}" target="_blank" rel="noreferrer">打开 Grafana 看板</a>`;
+        } else {
+          dashboardLinkWrap.textContent = "";
+        }
+      }
+
+      function renderDataNote(task) {
+        const description = task.dashboard_payload?.description;
+        if (description) {
+          dataNote.textContent = description;
+          return;
+        }
+        if (task.summary) {
+          dataNote.textContent = task.summary;
+          return;
+        }
+        dataNote.textContent = "当前看板会优先尝试展示直接数值、变化趋势、来源和明细。";
+      }
+
       function setStatus(task) {
         currentTaskId = task.id;
+        currentTask = task;
         const failed = task.status === "failed";
         statusTag.textContent = task.status;
         statusTag.className = failed ? "status-tag failed" : "status-tag";
@@ -474,16 +863,17 @@
         recordsMetric.textContent = task.records_count ?? 0;
         revisionMetric.textContent = `v${task.dashboard_revision ?? 1}`;
         errorText.textContent = task.error_message || "";
+        renderDashboardLink(task);
+        renderDataNote(task);
+
         refineButton.disabled = !task.id || task.status === "running" || task.records_count === 0;
         refineHint.textContent =
           task.records_count > 0
             ? "直接描述你想怎么改图，Grafinder 会基于已入库数据重建同一个 Grafana Dashboard。"
             : "先跑出一批结构化数据后，才能根据反馈重新生成图表。";
-        if (task.dashboard_url) {
-          dashboardLinkWrap.innerHTML = `<a class="grafana-link" href="${task.dashboard_url}" target="_blank" rel="noreferrer">打开 Grafana 面板</a>`;
-        } else {
-          dashboardLinkWrap.textContent = "";
-        }
+
+        sourcesButton.disabled = !task.id || (task.sources_count ?? 0) === 0;
+
         if (task.last_refinement_instruction) {
           refinementNoteWrap.hidden = false;
           refinementNote.textContent = task.last_refinement_instruction;
@@ -516,22 +906,91 @@
         }
       }
 
-      providerSelect.addEventListener("change", applyProviderDefaults);
+      async function loadSources(taskId) {
+        const response = await fetch(`/api/tasks/${taskId}/sources`);
+        const sources = await response.json();
+        sourceList.innerHTML = "";
+
+        const modeLabels = {
+          page_crawled: "直接网页抓取",
+          rss_summary_fallback: "RSS 摘要回退",
+          discovered_only: "仅发现未抓取",
+        };
+        const engineLabels = {
+          crawl4ai: "Crawl4AI",
+          httpx_fallback: "HTTP 回退抓取",
+          google_news_rss: "Google News RSS",
+        };
+
+        const directCount = sources.filter((item) => item.crawl_mode === "page_crawled").length;
+        const rssCount = sources.filter((item) => item.crawl_mode === "rss_summary_fallback").length;
+        const crawl4aiCount = sources.filter((item) => item.document_crawl_engine === "crawl4ai").length;
+        const fallbackCount = sources.filter((item) => item.document_crawl_engine === "httpx_fallback").length;
+        sourcesSummary.textContent = `共 ${sources.length} 个来源，直接网页抓取 ${directCount} 个，其中 Crawl4AI ${crawl4aiCount} 个，HTTP 回退 ${fallbackCount} 个，RSS 摘要回退 ${rssCount} 个。`;
+
+        sources.forEach((item) => {
+          const article = document.createElement("article");
+          article.className = "source-item";
+          article.innerHTML = `
+            <div>
+              <h4>${item.title}</h4>
+              <div class="source-meta">
+                <span class="pill">#${item.rank}</span>
+                <span class="pill">${modeLabels[item.crawl_mode] || item.crawl_mode}</span>
+                ${item.domain ? `<span class="pill">${item.domain}</span>` : ""}
+                ${item.document_source_name ? `<span class="pill">${item.document_source_name}</span>` : ""}
+                ${item.document_crawl_engine ? `<span class="pill">${engineLabels[item.document_crawl_engine] || item.document_crawl_engine}</span>` : ""}
+              </div>
+            </div>
+            <div class="hint">${item.document_summary || item.snippet || "暂无摘要。"}</div>
+            <div class="source-actions">
+              <a class="grafana-link" href="${item.url}" target="_blank" rel="noreferrer">打开来源网页</a>
+            </div>
+          `;
+          sourceList.appendChild(article);
+        });
+      }
+
+      providerSelect.addEventListener("change", () => {
+        applyProviderDefaults();
+        markSettingsDirty();
+      });
       modelPresetSelect.addEventListener("change", () => {
         if (modelPresetSelect.value !== "__custom__") {
           modelInput.value = modelPresetSelect.value;
         }
+        markSettingsDirty();
       });
-      modelInput.addEventListener("input", syncModelPreset);
+      modelInput.addEventListener("input", () => {
+        syncModelPreset();
+        markSettingsDirty();
+      });
+      baseUrlInput.addEventListener("input", markSettingsDirty);
+      apiKeyInput.addEventListener("input", markSettingsDirty);
+      testSettingsButton.addEventListener("click", testSettingsConnection);
+      saveSettingsButton.addEventListener("click", saveSettings);
+      clearSettingsButton.addEventListener("click", clearSavedSettings);
+
+      document.getElementById("open-settings").addEventListener("click", () => openDialog(settingsDialog));
+      document.querySelectorAll("[data-close-dialog]").forEach((button) => {
+        button.addEventListener("click", () => closeDialogById(button.dataset.closeDialog));
+      });
+
+      sourcesButton.addEventListener("click", async () => {
+        if (!currentTaskId) return;
+        await loadSources(currentTaskId);
+        openDialog(sourcesDialog);
+      });
 
       document.getElementById("task-form").addEventListener("submit", async (event) => {
         event.preventDefault();
         clearInterval(pollTimer);
         currentTaskId = null;
+        currentTask = null;
         grafanaWindow = window.open("", "_blank");
         if (grafanaWindow) {
           grafanaWindow.document.write(
-            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 面板生成中</h2><p>Agent 正在搜索来源、抓取网页、抽取结构化数据并构建本地 Grafana Dashboard。</p></div>"
+            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 看板生成中</h2><p>Agent 正在搜索直接来源、抓取网页、抽取结构化数据并构建本地 Grafana 分析看板。</p></div>"
           );
         }
 
@@ -541,10 +1000,13 @@
         statusText.textContent = "正在创建任务...";
         dashboardLinkWrap.textContent = "";
         errorText.textContent = "";
+        dataNote.textContent = "任务已提交，正在优先发现可分析的数据源。";
+        sourcesButton.disabled = true;
 
         const payload = {
           keyword: document.getElementById("keyword").value,
           intent: document.getElementById("intent").value,
+          source_hint: document.getElementById("source-hint").value || null,
           llm_provider: providerSelect.value || null,
           llm_model: modelInput.value || null,
           llm_base_url: baseUrlInput.value || null,
@@ -562,7 +1024,7 @@
           statusTag.textContent = "failed";
           statusTag.className = "status-tag failed";
           statusTitle.textContent = "任务创建失败";
-          statusText.textContent = "请检查 Provider 配置后重试。";
+          statusText.textContent = "请检查 Settings 里的 Provider 配置后重试。";
           errorText.textContent = detail.detail || "Unknown error";
           if (grafanaWindow && !grafanaWindow.closed) {
             grafanaWindow.close();
@@ -599,7 +1061,7 @@
         }
         if (grafanaWindow) {
           grafanaWindow.document.write(
-            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 面板调整中</h2><p>Agent 正在根据你的自然语言反馈，基于当前数据库里的结果重新设计 Grafana 图表。</p></div>"
+            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 看板调整中</h2><p>Agent 正在根据你的自然语言反馈，基于当前数据库里的结果重新设计 Grafana 分析看板。</p></div>"
           );
         }
 

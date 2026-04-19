@@ -140,7 +140,9 @@ Grafana queries `extracted_records` through PostgreSQL and builds panels such as
 
 - Local deployment uses `docker compose` to run `app + postgres + grafana`
 - Crawling dependencies are installed in [Dockerfile](/Users/xiaoyu/code/Grafinder/Dockerfile)
+- Crawl4AI is bundled inside the `app` container or the local `.venv`; it is not a separate standalone container
 - If Crawl4AI fails for a target page, the backend falls back to `httpx + BeautifulSoup`
+- The task source dialog shows whether each page was crawled by `Crawl4AI` or by the HTTP fallback path
 - Grafana datasource provisioning is defined in [grafana/provisioning/datasources/datasource.yml](/Users/xiaoyu/code/Grafinder/grafana/provisioning/datasources/datasource.yml)
 - Grafana is configured with anonymous viewer access so the auto-opened dashboard URL does not stop at the login page
 - If Docker image pulls fail, check Docker Desktop proxy settings in addition to terminal proxy variables

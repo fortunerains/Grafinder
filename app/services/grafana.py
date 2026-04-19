@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import re
+from datetime import datetime, timedelta, UTC
+from urllib.parse import urlencode
 
 import httpx
 
@@ -18,7 +20,14 @@ class GrafanaService:
     def __init__(self, settings: Settings):
         self.settings = settings
 
-    async def publish_dashboard(self, task_id: int, keyword: str, intent: str, design: DashboardDesign) -> tuple[str, str]:
+    async def publish_dashboard(
+        self,
+        task_id: int,
+        keyword: str,
+        intent: str,
+        design: DashboardDesign,
+        time_range: tuple[datetime | None, datetime | None] | None = None,
+    ) -> tuple[str, str]:
         await self._wait_until_ready()
         uid = f"grafinder-task-{task_id}"
         title = design.title or f"{keyword} | {intent}"
@@ -36,6 +45,7 @@ class GrafanaService:
             "description": design.description or "",
             "panels": self._build_panels(task_id, design),
         }
+        dashboard["time"] = self._dashboard_time(time_range)
 
         payload = {
             "dashboard": dashboard,
@@ -52,7 +62,8 @@ class GrafanaService:
             response = await client.post("/api/dashboards/db", json=payload)
             response.raise_for_status()
 
-        url = f"{self.settings.grafana_public_url}/d/{uid}/{_slugify(title)}?orgId=1"
+        query = urlencode(self._time_query_params(time_range) | {"orgId": 1})
+        url = f"{self.settings.grafana_public_url}/d/{uid}/{_slugify(title)}?{query}"
         return uid, url
 
     async def _wait_until_ready(self, attempts: int = 20, delay_seconds: float = 2.0) -> None:
@@ -87,8 +98,14 @@ class GrafanaService:
         time_sql = f"date_trunc('{spec.time_grain}', COALESCE({spec.time_field}, created_at))"
         aggregate_sql = self._aggregate_sql(spec.metric_operation, spec.metric_field)
         group_sql = self._dimension_sql(spec.group_by)
-        select_metric = ',\n  ' + group_sql + ' AS "metric"' if spec.group_by != "none" else ""
-        group_clause = ", 2" if spec.group_by != "none" else ""
+        where_sql = self._where_sql(task_id, spec)
+        if spec.group_by != "none":
+            select_metric = ',\n  ' + group_sql + ' AS "metric"'
+            group_clause = ", 2"
+        else:
+            series_name = self._sql_string(spec.series_name or self._default_series_name(spec))
+            select_metric = f',\n  {series_name} AS "metric"'
+            group_clause = ", 2"
         return {
             "id": panel_id,
             "title": spec.title,
@@ -108,7 +125,7 @@ SELECT
   {time_sql} AS "time"{select_metric},
   {aggregate_sql} AS "value"
 FROM extracted_records
-WHERE task_id = {task_id}
+WHERE {where_sql}
 GROUP BY 1{group_clause}
 ORDER BY 1
 """.strip(),
@@ -119,6 +136,7 @@ ORDER BY 1
     def _build_barchart_panel(self, task_id: int, panel_id: int, spec: DashboardPanelSpec) -> dict:
         dimension_sql = self._dimension_sql(spec.group_by if spec.group_by != "none" else "entity")
         aggregate_sql = self._aggregate_sql(spec.metric_operation, spec.metric_field)
+        where_sql = self._where_sql(task_id, spec)
         return {
             "id": panel_id,
             "title": spec.title,
@@ -138,7 +156,7 @@ SELECT
   {dimension_sql} AS label,
   {aggregate_sql} AS value
 FROM extracted_records
-WHERE task_id = {task_id}
+WHERE {where_sql}
 GROUP BY 1
 ORDER BY 2 {spec.sort_direction.upper()}
 LIMIT {spec.limit}
@@ -164,6 +182,7 @@ LIMIT {spec.limit}
             "summary",
         ]
         column_sql = ",\n  ".join(self._table_column_sql(column) for column in selected_columns)
+        where_sql = self._where_sql(task_id, spec)
         return {
             "id": panel_id,
             "title": spec.title,
@@ -182,7 +201,7 @@ LIMIT {spec.limit}
 SELECT
   {column_sql}
 FROM extracted_records
-WHERE task_id = {task_id}
+WHERE {where_sql}
 ORDER BY COALESCE(published_at, created_at) {spec.sort_direction.upper()} NULLS LAST, created_at DESC
 LIMIT {spec.limit}
 """.strip(),
@@ -191,7 +210,24 @@ LIMIT {spec.limit}
         }
 
     def _build_stat_panel(self, task_id: int, panel_id: int, spec: DashboardPanelSpec) -> dict:
-        aggregate_sql = self._aggregate_sql(spec.metric_operation, spec.metric_field)
+        where_sql = self._where_sql(task_id, spec)
+        if spec.value_mode == "latest" and spec.metric_field == "metric_value":
+            raw_sql = f"""
+SELECT
+  metric_value AS value
+FROM extracted_records
+WHERE {where_sql}
+ORDER BY COALESCE(published_at, created_at) DESC NULLS LAST, created_at DESC
+LIMIT 1
+""".strip()
+        else:
+            aggregate_sql = self._aggregate_sql(spec.metric_operation, spec.metric_field)
+            raw_sql = f"""
+SELECT
+  {aggregate_sql} AS value
+FROM extracted_records
+WHERE {where_sql}
+""".strip()
         return {
             "id": panel_id,
             "title": spec.title,
@@ -206,12 +242,7 @@ LIMIT {spec.limit}
                     "editorMode": "code",
                     "format": "table",
                     "rawQuery": True,
-                    "rawSql": f"""
-SELECT
-  {aggregate_sql} AS value
-FROM extracted_records
-WHERE task_id = {task_id}
-""".strip(),
+                    "rawSql": raw_sql,
                 }
             ],
             "options": {
@@ -261,6 +292,86 @@ WHERE task_id = {task_id}
             "source_url": "source_url",
         }
         return mapping[column]
+
+    @classmethod
+    def _where_sql(cls, task_id: int, spec: DashboardPanelSpec) -> str:
+        clauses = [f"task_id = {task_id}"]
+        if spec.require_numeric:
+            clauses.append("metric_value IS NOT NULL")
+
+        metric_clause = cls._match_any_sql(["COALESCE(metric_name, '')"], spec.record_metric_names)
+        if metric_clause:
+            clauses.append(metric_clause)
+
+        entity_clause = cls._match_any_sql(["COALESCE(entity, '')"], spec.record_entities)
+        if entity_clause:
+            clauses.append(entity_clause)
+
+        unit_clause = cls._match_any_sql(["COALESCE(metric_unit, '')"], spec.record_units)
+        if unit_clause:
+            clauses.append(unit_clause)
+
+        # When the dashboard already has explicit metric/entity/unit filters, free-form
+        # keywords often over-constrain the query and produce empty panels.
+        has_structured_filters = bool(metric_clause or entity_clause or unit_clause)
+        keyword_clause = cls._match_any_sql(
+            ["title", "COALESCE(entity, '')", "COALESCE(metric_name, '')", "summary"],
+            spec.record_keywords,
+        )
+        if keyword_clause and not has_structured_filters:
+            clauses.append(keyword_clause)
+
+        return "\n  AND ".join(clauses)
+
+    @classmethod
+    def _match_any_sql(cls, columns: list[str], values: list[str]) -> str | None:
+        normalized_values = [value.strip() for value in values if value and value.strip()]
+        if not normalized_values:
+            return None
+
+        comparisons: list[str] = []
+        for value in normalized_values:
+            pattern = cls._sql_like_pattern(value)
+            for column in columns:
+                comparisons.append(f"{column} ILIKE {pattern}")
+        return "(" + " OR ".join(comparisons) + ")"
+
+    @staticmethod
+    def _sql_like_pattern(value: str) -> str:
+        escaped = value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_").replace("'", "''")
+        return f"'%{escaped}%'"
+
+    @staticmethod
+    def _sql_string(value: str) -> str:
+        return "'" + value.replace("'", "''") + "'"
+
+    @staticmethod
+    def _default_series_name(spec: DashboardPanelSpec) -> str:
+        if spec.metric_field == "metric_value":
+            return "数值"
+        return "记录数"
+
+    @staticmethod
+    def _dashboard_time(time_range: tuple[datetime | None, datetime | None] | None) -> dict[str, str]:
+        if not time_range:
+            return {"from": "now-365d", "to": "now"}
+
+        start, end = time_range
+        if start is None and end is None:
+            return {"from": "now-365d", "to": "now"}
+
+        if start is None:
+            start = (end or datetime.now(UTC)) - timedelta(days=365)
+        if end is None:
+            end = datetime.now(UTC)
+        if start >= end:
+            end = start + timedelta(days=30)
+        return {"from": start.astimezone(UTC).isoformat(), "to": end.astimezone(UTC).isoformat()}
+
+    @classmethod
+    def _time_query_params(cls, time_range: tuple[datetime | None, datetime | None] | None) -> dict[str, str]:
+        time_config = cls._dashboard_time(time_range)
+        return {"from": time_config["from"], "to": time_config["to"]}
 
     @staticmethod
     def _grid_position(panel_type: str, panel_id: int) -> dict[str, int]:

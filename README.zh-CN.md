@@ -134,6 +134,12 @@ Grafinder 没有把模型接口写死为 OpenAI，而是做成了 Provider Regis
 - `Crawl4AI`
 - `Playwright Chromium`
 
+说明：
+
+- `Crawl4AI` 不是单独起一个容器，而是直接安装在 `app` 服务容器里
+- 如果你走宿主机模式，它则安装在本项目的 `.venv` 里
+- 页面“查看抓取来源”窗口里会标注每个页面是 `Crawl4AI` 直抓还是 HTTP 回退抓取
+
 另外，宿主机运行模式也支持读取代理环境变量：
 
 - `HTTP_PROXY`
