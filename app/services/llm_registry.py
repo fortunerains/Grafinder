@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from app.config import Settings
 from app.schemas import LLMRuntimeConfig, ProviderOption
@@ -23,23 +24,48 @@ class ProviderRegistry:
         return stripped or None
 
     @staticmethod
-    def _derived_env_name(api_key_env: str | None, suffix: str) -> str | None:
-        if not api_key_env or not api_key_env.endswith("_API_KEY"):
-            return None
-        prefix = api_key_env[: -len("_API_KEY")]
-        return f"{prefix}_{suffix}"
+    def _iter_env_names(raw: Any) -> list[str]:
+        if raw is None:
+            return []
+        if isinstance(raw, str):
+            return [raw]
+        if isinstance(raw, list):
+            return [item for item in raw if isinstance(item, str)]
+        return []
 
-    def _resolve_spec_value(self, spec: dict, field: str) -> str:
-        env_field_name = f"{field}_env"
-        explicit_env_name = spec.get(env_field_name)
-        derived_env_name = None
+    def _read_first_env(self, raw: Any) -> str | None:
+        for name in self._iter_env_names(raw):
+            value = self._read_env(name)
+            if value:
+                return value
+        return None
+
+    @classmethod
+    def _derived_env_names(cls, api_key_envs: Any, suffix: str) -> list[str]:
+        derived: list[str] = []
+        for api_key_env in cls._iter_env_names(api_key_envs):
+            if api_key_env.endswith("_API_KEY"):
+                prefix = api_key_env[: -len("_API_KEY")]
+                derived.append(f"{prefix}_{suffix}")
+        return derived
+
+    def _resolve_spec_value(self, spec: dict[str, Any], field: str) -> str:
+        env_names: list[str] = []
+        env_names.extend(self._iter_env_names(spec.get(f"{field}_env")))
+        env_names.extend(self._iter_env_names(spec.get(f"{field}_envs")))
         if field == "base_url":
-            derived_env_name = self._derived_env_name(spec.get("api_key_env"), "BASE_URL")
+            env_names.extend(self._derived_env_names(spec.get("api_key_envs") or spec.get("api_key_env"), "BASE_URL"))
         elif field == "model":
-            derived_env_name = self._derived_env_name(spec.get("api_key_env"), "MODEL")
+            env_names.extend(self._derived_env_names(spec.get("api_key_envs") or spec.get("api_key_env"), "MODEL"))
 
-        env_value = self._read_env(explicit_env_name) or self._read_env(derived_env_name)
+        env_value = self._read_first_env(env_names)
         return env_value or spec.get(field, "")
+
+    def _resolve_api_key(self, spec: dict[str, Any], override: str | None = None) -> tuple[str | None, list[str]]:
+        env_names: list[str] = []
+        env_names.extend(self._iter_env_names(spec.get("api_key_env")))
+        env_names.extend(self._iter_env_names(spec.get("api_key_envs")))
+        return override or self._read_first_env(env_names), env_names
 
     def _load_registry(self) -> dict:
         path = self.settings.llm_providers_path
@@ -52,8 +78,10 @@ class ProviderRegistry:
                 "openai": {
                     "label": "OpenAI",
                     "base_url": "https://api.openai.com/v1",
-                    "model": "gpt-4.1-mini",
+                    "model": "gpt-5.4-mini",
                     "api_key_env": "OPENAI_API_KEY",
+                    "adapter": "openai_compatible_chat",
+                    "json_mode": "auto",
                 }
             },
         }
@@ -67,6 +95,10 @@ class ProviderRegistry:
                 label=spec.get("label", name),
                 base_url=self._resolve_spec_value(spec, "base_url"),
                 model=self._resolve_spec_value(spec, "model"),
+                model_options=spec.get("model_options", []),
+                adapter=spec.get("adapter", "openai_compatible_chat"),
+                json_mode=spec.get("json_mode", "auto"),
+                description=spec.get("description"),
             )
             for name, spec in registry.get("providers", {}).items()
         ]
@@ -89,14 +121,17 @@ class ProviderRegistry:
             raise ValueError(f"Unknown LLM provider '{selected_name}'. Available providers: {available}")
 
         spec = providers[selected_name]
-        api_key_env = spec.get("api_key_env")
-        api_key = api_key_override or self._read_env(api_key_env)
+        api_key, api_key_env_names = self._resolve_api_key(spec, api_key_override)
         base_url = base_url_override or self._resolve_spec_value(spec, "base_url")
         model = model_override or self._resolve_spec_value(spec, "model")
 
         if self.settings.llm_required and not api_key:
-            hint = api_key_env or "your provider API key"
+            hint = " / ".join(api_key_env_names) or "your provider API key"
             raise ValueError(f"Missing API key for provider '{selected_name}'. Configure {hint} or fill the advanced field.")
+        if not base_url:
+            raise ValueError(f"Missing base URL for provider '{selected_name}'. Configure it in .env, provider config, or the advanced field.")
+        if not model:
+            raise ValueError(f"Missing model for provider '{selected_name}'. Configure it in .env, provider config, or the advanced field.")
 
         return LLMRuntimeConfig(
             provider=selected_name,
@@ -104,4 +139,6 @@ class ProviderRegistry:
             base_url=base_url,
             model=model,
             api_key=api_key,
+            adapter=spec.get("adapter", "openai_compatible_chat"),
+            json_mode=spec.get("json_mode", "auto"),
         )

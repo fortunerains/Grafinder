@@ -2,28 +2,76 @@
   "default_provider": "openai",
   "providers": {
     "openai": {
-      "label": "OpenAI",
+      "label": "OpenAI (official)",
+      "description": "Official OpenAI endpoint via Chat Completions. Model is configurable, including GPT-5.4 class models when your account has access.",
+      "adapter": "openai_compatible_chat",
       "base_url": "https://api.openai.com/v1",
       "base_url_env": "OPENAI_BASE_URL",
-      "model": "gpt-4.1-mini",
+      "model": "gpt-5.4-mini",
       "model_env": "OPENAI_MODEL",
-      "api_key_env": "OPENAI_API_KEY"
+      "model_options": ["gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano", "gpt-4.1-mini"],
+      "api_key_env": "OPENAI_API_KEY",
+      "json_mode": "auto"
+    },
+    "ikuncode": {
+      "label": "IKunCode Relay",
+      "description": "OpenAI-compatible relay documented at docs.ikuncode.cc/api/chat. Often used with Claude, GPT, Gemini, or other routed models.",
+      "adapter": "openai_compatible_chat",
+      "base_url": "https://api.ikuncode.cc/v1",
+      "base_url_env": "IKUNCODE_BASE_URL",
+      "model": "claude-sonnet-4-20250514",
+      "model_env": "IKUNCODE_MODEL",
+      "model_options": ["claude-sonnet-4-20250514", "gpt-5.4", "deepseek-chat", "qwen-plus"],
+      "api_key_env": "IKUNCODE_API_KEY",
+      "json_mode": "auto"
+    },
+    "deepseek": {
+      "label": "DeepSeek",
+      "description": "Official DeepSeek API with OpenAI-compatible chat format.",
+      "adapter": "openai_compatible_chat",
+      "base_url": "https://api.deepseek.com/v1",
+      "base_url_env": "DEEPSEEK_BASE_URL",
+      "model": "deepseek-chat",
+      "model_env": "DEEPSEEK_MODEL",
+      "model_options": ["deepseek-chat", "deepseek-reasoner"],
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "json_mode": "auto"
     },
     "doubao": {
       "label": "Doubao / Volcano Engine",
+      "description": "Volcano Engine / Ark endpoint. The exact base URL can vary by region or product plan, so override it if your account uses a different entrypoint.",
+      "adapter": "openai_compatible_chat",
       "base_url": "https://ark.cn-beijing.volces.com/api/v3",
-      "base_url_env": "DOUBAO_BASE_URL",
-      "model": "ep-your-doubao-endpoint",
-      "model_env": "DOUBAO_MODEL",
-      "api_key_env": "DOUBAO_API_KEY"
+      "base_url_envs": ["DOUBAO_BASE_URL", "ARK_BASE_URL"],
+      "model": "doubao-seed-1-6-251015",
+      "model_envs": ["DOUBAO_MODEL", "ARK_MODEL"],
+      "model_options": ["doubao-seed-1-6-251015"],
+      "api_key_envs": ["DOUBAO_API_KEY", "ARK_API_KEY"],
+      "json_mode": "auto"
+    },
+    "qwen": {
+      "label": "Qwen / DashScope",
+      "description": "Alibaba DashScope OpenAI-compatible endpoint. The default uses the Beijing region; switch the base URL if your key belongs to another region.",
+      "adapter": "openai_compatible_chat",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "base_url_envs": ["QWEN_BASE_URL", "DASHSCOPE_BASE_URL"],
+      "model": "qwen3.6-plus",
+      "model_envs": ["QWEN_MODEL", "DASHSCOPE_MODEL"],
+      "model_options": ["qwen3.6-plus", "qwen-plus", "qwen-max"],
+      "api_key_envs": ["QWEN_API_KEY", "DASHSCOPE_API_KEY"],
+      "json_mode": "auto"
     },
     "custom": {
       "label": "Custom OpenAI Compatible",
+      "description": "Generic OpenAI-compatible endpoint. Use this if your relay or self-hosted service is not already listed.",
+      "adapter": "openai_compatible_chat",
       "base_url": "https://your-llm-endpoint.example.com/v1",
       "base_url_env": "CUSTOM_LLM_BASE_URL",
       "model": "your-model-name",
       "model_env": "CUSTOM_LLM_MODEL",
-      "api_key_env": "CUSTOM_LLM_API_KEY"
+      "model_options": [],
+      "api_key_env": "CUSTOM_LLM_API_KEY",
+      "json_mode": "auto"
     }
   }
 }

@@ -44,6 +44,7 @@ class ExtractionService:
 """.strip()
 
         payload = await self.llm_client.complete_json(runtime, system_prompt, user_prompt)
+        payload = self._normalize_payload(payload)
         envelope = ExtractionEnvelope.model_validate(payload)
         if envelope.records:
             return envelope
@@ -67,3 +68,20 @@ class ExtractionService:
             records=[fallback],
         )
 
+    @staticmethod
+    def _normalize_payload(payload: dict) -> dict:
+        records = payload.get("records")
+        if not isinstance(records, list):
+            return payload
+
+        normalized_records = []
+        for record in records:
+            if not isinstance(record, dict):
+                continue
+            raw_payload = record.get("raw_payload")
+            if raw_payload is not None and not isinstance(raw_payload, dict):
+                record = {**record, "raw_payload": {"value": raw_payload}}
+            normalized_records.append(record)
+
+        payload["records"] = normalized_records
+        return payload

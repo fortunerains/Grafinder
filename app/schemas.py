@@ -5,12 +5,19 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+ProviderAdapter = Literal["openai_compatible_chat"]
+JsonOutputMode = Literal["auto", "response_format", "prompt_only"]
+
 
 class ProviderOption(BaseModel):
     name: str
     label: str
     base_url: str
     model: str
+    model_options: list[str] = Field(default_factory=list)
+    adapter: ProviderAdapter = "openai_compatible_chat"
+    json_mode: JsonOutputMode = "auto"
+    description: str | None = None
 
 
 class LLMRuntimeConfig(BaseModel):
@@ -19,6 +26,8 @@ class LLMRuntimeConfig(BaseModel):
     base_url: str
     model: str
     api_key: str | None = None
+    adapter: ProviderAdapter = "openai_compatible_chat"
+    json_mode: JsonOutputMode = "auto"
 
 
 class TaskCreate(BaseModel):

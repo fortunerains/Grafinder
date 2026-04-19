@@ -302,14 +302,19 @@
               这里预留了多 Provider 切换能力。默认会读取本地 provider 配置和 `.env` 里的 Base URL、模型、API Key，
               你也可以临时覆盖它们，因此不仅能接 OpenAI，也可以接豆包或任意 OpenAI 兼容中转接口。
             </p>
+            <p id="provider-note" class="hint"></p>
             <div class="grid">
               <label>
                 Provider
                 <select id="llm-provider" name="llm_provider"></select>
               </label>
               <label>
+                模型预设
+                <select id="llm-model-preset" name="llm_model_preset"></select>
+              </label>
+              <label>
                 Model
-                <input id="llm-model" name="llm_model" placeholder="例如：gpt-4.1-mini / ep-xxxx" />
+                <input id="llm-model" name="llm_model" placeholder="可直接选择预设，也可以手动输入，例如：gpt-5.4 / claude-sonnet-4-20250514" />
               </label>
               <label>
                 Base URL
@@ -317,7 +322,7 @@
               </label>
               <label>
                 API Key
-                <input id="llm-api-key" name="llm_api_key" type="password" placeholder="留空则读取环境变量" />
+                <input id="llm-api-key" name="llm_api_key" type="password" placeholder="可直接复制粘贴，留空则读取环境变量" />
               </label>
             </div>
           </details>
@@ -381,9 +386,11 @@
 
     <script>
       const providerSelect = document.getElementById("llm-provider");
+      const modelPresetSelect = document.getElementById("llm-model-preset");
       const modelInput = document.getElementById("llm-model");
       const baseUrlInput = document.getElementById("llm-base-url");
       const apiKeyInput = document.getElementById("llm-api-key");
+      const providerNote = document.getElementById("provider-note");
       const statusTag = document.getElementById("status-tag");
       const statusTitle = document.getElementById("status-title");
       const statusText = document.getElementById("status-text");
@@ -428,8 +435,31 @@
       function applyProviderDefaults() {
         const provider = providerIndex[providerSelect.value];
         if (!provider) return;
+        modelPresetSelect.innerHTML = "";
+        const modelOptions = Array.isArray(provider.model_options) ? provider.model_options : [];
+        const mergedOptions = Array.from(new Set([provider.model, ...modelOptions].filter(Boolean)));
+        mergedOptions.forEach((modelName) => {
+          const option = document.createElement("option");
+          option.value = modelName;
+          option.textContent = modelName;
+          if (modelName === provider.model) {
+            option.selected = true;
+          }
+          modelPresetSelect.appendChild(option);
+        });
+        const customOption = document.createElement("option");
+        customOption.value = "__custom__";
+        customOption.textContent = "手动输入模型";
+        modelPresetSelect.appendChild(customOption);
         modelInput.value = provider.model || "";
         baseUrlInput.value = provider.base_url || "";
+        providerNote.textContent = provider.description || "";
+      }
+
+      function syncModelPreset() {
+        const currentModel = modelInput.value.trim();
+        const options = Array.from(modelPresetSelect.options).map((option) => option.value);
+        modelPresetSelect.value = options.includes(currentModel) ? currentModel : "__custom__";
       }
 
       function setStatus(task) {
@@ -487,6 +517,12 @@
       }
 
       providerSelect.addEventListener("change", applyProviderDefaults);
+      modelPresetSelect.addEventListener("change", () => {
+        if (modelPresetSelect.value !== "__custom__") {
+          modelInput.value = modelPresetSelect.value;
+        }
+      });
+      modelInput.addEventListener("input", syncModelPreset);
 
       document.getElementById("task-form").addEventListener("submit", async (event) => {
         event.preventDefault();

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 from collections.abc import Iterable
 
 from sqlalchemy import desc, func, select
@@ -8,7 +9,7 @@ from sqlalchemy import desc, func, select
 from app.config import Settings
 from app.db import SessionLocal
 from app.models import Document, ExtractedRecord, IngestionTask, SourceCandidate, TaskStatus
-from app.schemas import CrawledDocument, LLMRuntimeConfig, SearchPlan
+from app.schemas import CrawledDocument, DashboardDesign, LLMRuntimeConfig, SearchPlan
 from app.services.crawl import CrawlService
 from app.services.dashboard_designer import DashboardDesignerService
 from app.services.extract import ExtractionService
@@ -16,6 +17,8 @@ from app.services.grafana import GrafanaService
 from app.services.llm import LLMJsonClient
 from app.services.planner import PlannerService
 from app.services.search import SearchService
+
+logger = logging.getLogger(__name__)
 
 
 def _fingerprint(parts: Iterable[str | None]) -> str:
@@ -25,7 +28,7 @@ def _fingerprint(parts: Iterable[str | None]) -> str:
 
 class TaskRunner:
     def __init__(self, settings: Settings):
-        llm_client = LLMJsonClient()
+        llm_client = LLMJsonClient(settings)
         self.settings = settings
         self.planner = PlannerService(llm_client)
         self.search = SearchService(settings)
@@ -52,7 +55,7 @@ class TaskRunner:
             for document in stored_documents:
                 total_records += await self._extract_and_store(task, plan, document, runtime)
 
-            dashboard_design = await self._design_dashboard(
+            dashboard_design, used_fallback_design = await self._design_dashboard(
                 task=task,
                 runtime=runtime,
                 panel_hint=plan.preferred_panel_type or self._fallback_panel(task.intent),
@@ -61,9 +64,10 @@ class TaskRunner:
             )
             dashboard_uid, dashboard_url = await self.grafana.publish_dashboard(task_id=task_id, keyword=task.keyword, intent=task.intent, design=dashboard_design)
 
+            dashboard_mode = "a fallback Grafana dashboard" if used_fallback_design else "the Grafana dashboard"
             summary = (
                 f"Found {len(sources)} sources, crawled {len(stored_documents)} pages, "
-                f"saved {total_records} structured records, and published the Grafana dashboard."
+                f"saved {total_records} structured records, and published {dashboard_mode}."
             )
             await self._update_task(
                 task_id,
@@ -87,7 +91,7 @@ class TaskRunner:
                 last_refinement_instruction=instruction,
             )
 
-            dashboard_design = await self._design_dashboard(
+            dashboard_design, _ = await self._design_dashboard(
                 task=task,
                 runtime=runtime,
                 panel_hint=self._preferred_panel_hint(task),
@@ -291,10 +295,10 @@ class TaskRunner:
         panel_hint: str,
         refinement_instruction: str | None,
         allow_fallback: bool,
-    ):
+    ) -> tuple[DashboardDesign, bool]:
         dataset_profile = await self._build_dataset_profile(task.id)
         try:
-            return await self.dashboard_designer.design_dashboard(
+            design = await self.dashboard_designer.design_dashboard(
                 keyword=task.keyword,
                 intent=task.intent,
                 panel_hint=panel_hint,
@@ -302,9 +306,15 @@ class TaskRunner:
                 runtime=runtime,
                 refinement_instruction=refinement_instruction,
             )
+            return design, False
         except Exception:
             if allow_fallback:
-                return self.dashboard_designer.build_default_design(task.keyword, task.intent, panel_hint)
+                logger.warning(
+                    "Falling back to default dashboard design for task %s",
+                    task.id,
+                    exc_info=True,
+                )
+                return self.dashboard_designer.build_default_design(task.keyword, task.intent, panel_hint), True
             raise
 
     async def _build_dataset_profile(self, task_id: int) -> dict:

@@ -17,6 +17,7 @@ from app.services.llm_registry import ProviderRegistry
 from app.services.task_runner import TaskRunner
 
 settings = get_settings()
+settings.apply_process_proxy_env()
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 provider_registry = ProviderRegistry(settings)
 

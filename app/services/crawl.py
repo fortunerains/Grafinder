@@ -31,10 +31,18 @@ class CrawlService:
         self.settings = settings
 
     async def crawl(self, sources: list[SearchResultItem]) -> list[CrawledDocument]:
+        synthetic_documents = [self._build_google_news_document(source) for source in sources if self._is_google_news_source(source)]
+        normal_sources = [source for source in sources if not self._is_google_news_source(source)]
+
+        if not normal_sources:
+            return synthetic_documents
+
         try:
-            return await self._crawl_with_crawl4ai(sources)
+            crawled = await self._crawl_with_crawl4ai(normal_sources)
         except Exception:
-            return await self._crawl_with_httpx(sources)
+            crawled = await self._crawl_with_httpx(normal_sources)
+
+        return synthetic_documents + crawled
 
     async def _crawl_with_crawl4ai(self, sources: list[SearchResultItem]) -> list[CrawledDocument]:
         from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
@@ -91,7 +99,15 @@ class CrawlService:
     async def _crawl_with_httpx(self, sources: list[SearchResultItem]) -> list[CrawledDocument]:
         documents: list[CrawledDocument] = []
         timeout = httpx.Timeout(self.settings.crawl_timeout_seconds)
-        async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
+        client_kwargs: dict[str, Any] = {
+            "timeout": timeout,
+            "follow_redirects": True,
+            "trust_env": False,
+        }
+        if self.settings.preferred_proxy:
+            client_kwargs["proxy"] = self.settings.preferred_proxy
+
+        async with httpx.AsyncClient(**client_kwargs) as client:
             for source in sources:
                 response = await client.get(source.url, headers={"User-Agent": "Grafinder/0.1"})
                 response.raise_for_status()
@@ -147,3 +163,42 @@ class CrawlService:
         if shutil.which("google-chrome") or shutil.which("google-chrome-stable"):
             return "chrome"
         return "chromium"
+
+    @staticmethod
+    def _is_google_news_source(source: SearchResultItem) -> bool:
+        return "news.google.com/rss/articles/" in source.url and bool(source.snippet)
+
+    def _build_google_news_document(self, source: SearchResultItem) -> CrawledDocument:
+        snippet_lines = [line.strip() for line in (source.snippet or "").splitlines() if line.strip()]
+        summary = ""
+        source_name = source.domain or "Google News"
+        published_at = None
+
+        for line in snippet_lines:
+            if line.startswith("Summary:"):
+                summary = line.removeprefix("Summary:").strip()
+            elif line.startswith("Source:"):
+                source_name = line.removeprefix("Source:").strip() or source_name
+            elif line.startswith("Published:"):
+                published_at = _parse_datetime(line.removeprefix("Published:").strip())
+
+        markdown = "\n\n".join(
+            part
+            for part in [
+                f"# {source.title}",
+                f"Source: {source_name}",
+                f"Published: {published_at.isoformat() if published_at else 'Unknown'}",
+                summary or (source.snippet or ""),
+                "This content was synthesized from a Google News RSS fallback result because direct web search results were unavailable.",
+            ]
+            if part
+        )
+
+        return CrawledDocument(
+            url=source.url,
+            title=source.title,
+            source_name=source_name,
+            published_at=published_at,
+            markdown=markdown[: self.settings.crawl_max_markdown_chars],
+            raw_metadata={"synthetic_source": "google_news_rss"},
+        )
