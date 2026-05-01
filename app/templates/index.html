@@ -6,17 +6,20 @@
     <title>{{ app_name }}</title>
     <style>
       :root {
-        --bg-top: #efe6d7;
-        --bg-bottom: #d7e6ee;
-        --ink: #112132;
-        --muted: #5b6c7c;
-        --card: rgba(255, 255, 255, 0.86);
-        --line: rgba(17, 33, 50, 0.09);
-        --accent: #0b7a67;
-        --accent-deep: #08584c;
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --surface-soft: #f0f5f4;
+        --ink: #17212f;
+        --muted: #617083;
+        --line: #dce3e8;
+        --accent: #0f766e;
+        --accent-dark: #115e59;
+        --accent-soft: #d9f0ec;
+        --warn: #9a5b00;
+        --warn-soft: #fff3d9;
         --danger: #b42318;
-        --chip: rgba(11, 122, 103, 0.09);
-        --shadow: 0 24px 64px rgba(17, 33, 50, 0.14);
+        --danger-soft: #fde7e4;
+        --shadow: 0 10px 28px rgba(23, 33, 47, 0.08);
       }
 
       * {
@@ -26,69 +29,11 @@
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Avenir Next", "PingFang SC", "Segoe UI", sans-serif;
+        font-family: "Inter", "PingFang SC", "Segoe UI", system-ui, sans-serif;
         color: var(--ink);
-        background:
-          radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 32%),
-          linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
+        background: var(--bg);
       }
 
-      main {
-        width: min(1080px, calc(100vw - 32px));
-        margin: 32px auto 48px;
-        display: grid;
-        gap: 20px;
-      }
-
-      .card {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 24px;
-        box-shadow: var(--shadow);
-        backdrop-filter: blur(12px);
-      }
-
-      .hero {
-        padding: 24px 26px;
-      }
-
-      .hero-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: flex-start;
-      }
-
-      .eyebrow {
-        font-size: 12px;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 8px;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: clamp(34px, 5vw, 56px);
-        line-height: 0.94;
-      }
-
-      .hero p {
-        margin: 12px 0 0;
-        max-width: 760px;
-        color: var(--muted);
-        line-height: 1.75;
-      }
-
-      .hero-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-      }
-
-      .ghost-button,
       button,
       input,
       select,
@@ -96,49 +41,135 @@
         font: inherit;
       }
 
-      .ghost-button,
-      button {
-        border: none;
-        border-radius: 999px;
-        cursor: pointer;
-        transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+      a {
+        color: inherit;
       }
 
-      button {
-        padding: 14px 22px;
-        background: linear-gradient(135deg, var(--accent), var(--accent-deep));
-        color: white;
-        font-weight: 700;
+      [hidden] {
+        display: none !important;
       }
 
-      .ghost-button {
-        padding: 12px 18px;
-        background: rgba(17, 33, 50, 0.05);
-        color: var(--ink);
-        font-weight: 600;
-      }
-
-      button:hover,
-      .ghost-button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 14px 26px rgba(17, 33, 50, 0.12);
-      }
-
-      button[disabled],
-      .ghost-button[disabled] {
-        opacity: 0.55;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-      }
-
-      .section {
+      .login-screen {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
         padding: 24px;
       }
 
-      .section-title {
-        margin: 0 0 14px;
-        font-size: 22px;
+      .login-panel {
+        width: min(420px, 100%);
+        display: grid;
+        gap: 18px;
+        padding: 28px;
+      }
+
+      .login-panel .brand {
+        align-items: flex-start;
+      }
+
+      .login-panel form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .auth-switch {
+        justify-content: center;
+      }
+
+      .topbar {
+        min-height: 64px;
+        border-bottom: 1px solid var(--line);
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .brand-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--accent);
+        color: white;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.1;
+      }
+
+      .brand span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .user-chip {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .workspace {
+        width: min(1440px, calc(100vw - 32px));
+        margin: 18px auto 28px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.65fr);
+        gap: 16px;
+        align-items: start;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .chat-panel {
+        min-height: calc(100vh - 110px);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      .panel-head {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .panel-head h2,
+      .side-title {
+        margin: 0;
+        font-size: 16px;
       }
 
       .hint {
@@ -147,21 +178,96 @@
         line-height: 1.65;
       }
 
-      form {
-        display: grid;
-        gap: 18px;
+      .status-chip,
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 26px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
       }
 
-      .grid {
+      .status-chip.failed,
+      .pill.failed {
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      .pill.warn {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+
+      .chat-log {
+        padding: 18px;
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
+        align-content: start;
+        gap: 14px;
+        overflow: auto;
+        max-height: calc(100vh - 350px);
+        min-height: 360px;
+      }
+
+      .message {
+        display: grid;
+        gap: 6px;
+        max-width: min(780px, 92%);
+      }
+
+      .message.user {
+        justify-self: end;
+      }
+
+      .message.assistant {
+        justify-self: start;
+      }
+
+      .bubble {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 14px;
+        line-height: 1.65;
+        background: #f8fafb;
+        white-space: pre-wrap;
+      }
+
+      .message.user .bubble {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+
+      .message-meta {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .composer {
+        border-top: 1px solid var(--line);
+        padding: 16px 18px;
+        display: grid;
+        gap: 14px;
+        background: #fbfcfd;
+        border-radius: 0 0 8px 8px;
+      }
+
+      .start-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) 180px 220px;
+        gap: 12px;
       }
 
       label {
         display: grid;
-        gap: 8px;
-        font-size: 14px;
+        gap: 6px;
+        color: var(--ink);
+        font-size: 13px;
         font-weight: 700;
       }
 
@@ -169,385 +275,419 @@
       select,
       textarea {
         width: 100%;
-        border-radius: 18px;
-        border: 1px solid rgba(17, 33, 50, 0.12);
-        padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid #cfd8df;
+        border-radius: 8px;
+        background: white;
         color: var(--ink);
+        padding: 11px 12px;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 86px;
       }
 
       input:focus,
       select:focus,
       textarea:focus {
         outline: none;
-        border-color: rgba(11, 122, 103, 0.42);
-        box-shadow: 0 0 0 4px rgba(11, 122, 103, 0.08);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
       }
 
-      textarea {
-        min-height: 120px;
-        resize: vertical;
-      }
-
-      .actions {
+      .composer-actions,
+      .button-row {
         display: flex;
-        gap: 12px;
         align-items: center;
+        justify-content: space-between;
+        gap: 12px;
         flex-wrap: wrap;
       }
 
-      .status-wrap {
-        display: grid;
-        gap: 14px;
-      }
-
-      .status-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 14px;
-        align-items: flex-start;
-      }
-
-      .status-tag {
+      button,
+      .button-link {
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+        background: var(--accent);
+        color: white;
+        font-weight: 700;
+        text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: var(--chip);
-        color: var(--accent-deep);
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
+        justify-content: center;
+        gap: 8px;
       }
 
-      .status-tag.failed {
-        background: rgba(180, 35, 24, 0.1);
-        color: var(--danger);
+      button.secondary,
+      .button-link.secondary {
+        background: white;
+        border-color: var(--line);
+        color: var(--ink);
       }
 
-      .status-title {
-        margin: 12px 0 8px;
-        font-size: 36px;
-        line-height: 1.08;
+      button:disabled,
+      .button-link[aria-disabled="true"] {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
       }
 
-      .metrics {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-      }
-
-      .metric {
-        border-radius: 18px;
-        padding: 16px;
-        background: rgba(11, 122, 103, 0.06);
-      }
-
-      .metric strong {
-        display: block;
-        font-size: 30px;
-        margin-bottom: 4px;
-      }
-
-      .status-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-
-      .grafana-link {
-        color: var(--accent-deep);
-        font-weight: 700;
-      }
-
-      .data-note {
-        border-radius: 16px;
-        padding: 14px 16px;
-        background: rgba(11, 122, 103, 0.06);
-      }
-
-      .error {
-        color: var(--danger);
-      }
-
-      dialog {
-        width: min(760px, calc(100vw - 24px));
-        border: none;
-        border-radius: 24px;
-        padding: 0;
-        box-shadow: 0 32px 80px rgba(17, 33, 50, 0.24);
-        background: rgba(250, 252, 252, 0.98);
-      }
-
-      dialog::backdrop {
-        background: rgba(17, 33, 50, 0.32);
-        backdrop-filter: blur(6px);
-      }
-
-      .dialog-shell {
-        padding: 22px;
+      .side-panel {
         display: grid;
         gap: 16px;
       }
 
-      .dialog-head {
+      .side-section {
+        padding: 16px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .metric {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+        background: #fbfcfd;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 24px;
+        margin-bottom: 3px;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .phase-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .phase {
         display: flex;
         justify-content: space-between;
         gap: 12px;
-        align-items: center;
+        padding: 9px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .phase.active {
+        color: var(--accent-dark);
+        border-color: rgba(15, 118, 110, 0.35);
+        background: var(--accent-soft);
+        font-weight: 700;
+      }
+
+      .notice {
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #fbfcfd;
+        padding: 12px;
+      }
+
+      .notice.warn {
+        border-color: #f4d28e;
+        background: var(--warn-soft);
+      }
+
+      .error {
+        color: var(--danger);
+        min-height: 20px;
+        margin: 0;
+      }
+
+      dialog {
+        width: min(860px, calc(100vw - 24px));
+        border: none;
+        border-radius: 8px;
+        padding: 0;
+        box-shadow: 0 24px 70px rgba(23, 33, 47, 0.24);
+      }
+
+      dialog::backdrop {
+        background: rgba(23, 33, 47, 0.34);
+      }
+
+      .dialog-shell {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .dialog-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
       }
 
       .dialog-head h3 {
-        margin: 0;
-        font-size: 24px;
-      }
-
-      .close-button {
-        border: none;
-        background: rgba(17, 33, 50, 0.06);
-        border-radius: 999px;
-        padding: 10px 14px;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .source-list {
-        display: grid;
-        gap: 12px;
-        max-height: 64vh;
-        overflow: auto;
-      }
-
-      .source-item {
-        border: 1px solid rgba(17, 33, 50, 0.09);
-        border-radius: 18px;
-        padding: 16px;
-        background: white;
-        display: grid;
-        gap: 10px;
-      }
-
-      .source-item h4 {
-        margin: 0;
-        font-size: 18px;
-      }
-
-      .source-meta {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 5px 10px;
-        border-radius: 999px;
-        background: rgba(17, 33, 50, 0.06);
-        font-size: 12px;
-        font-weight: 700;
-      }
-
-      .source-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+        margin: 0 0 5px;
       }
 
       .settings-grid {
         display: grid;
-        gap: 14px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .dialog-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
         gap: 12px;
-        flex-wrap: wrap;
       }
 
-      .dialog-button-group {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .settings-note {
-        min-height: 20px;
-      }
-
-      .settings-note.saved {
-        color: var(--accent-deep);
-      }
-
-      .settings-note.error {
-        color: var(--danger);
-      }
-
-      .refine-wrap {
+      .source-list {
         display: grid;
-        gap: 12px;
+        gap: 10px;
+        max-height: 62vh;
+        overflow: auto;
       }
 
-      .subtle-box {
-        padding: 14px 16px;
-        border-radius: 16px;
-        background: rgba(11, 122, 103, 0.05);
+      .source-item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 13px;
+        display: grid;
+        gap: 8px;
       }
 
-      .subtle-box strong {
-        display: block;
-        margin-bottom: 6px;
+      .source-item h4 {
+        margin: 0;
+        font-size: 15px;
       }
 
-      @media (max-width: 820px) {
-        main {
-          width: min(100vw - 20px, 1080px);
-          margin-top: 20px;
+      .source-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      @media (max-width: 1040px) {
+        .workspace {
+          grid-template-columns: 1fr;
         }
 
-        .hero-head,
-        .status-top {
+        .chat-panel {
+          min-height: auto;
+        }
+
+        .chat-log {
+          max-height: none;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .topbar {
+          padding: 12px;
+          align-items: flex-start;
           flex-direction: column;
         }
 
-        .grid,
-        .metrics,
+        .workspace {
+          width: min(100vw - 18px, 1440px);
+        }
+
+        .start-grid,
         .settings-grid {
           grid-template-columns: 1fr;
         }
 
-        .hero-actions {
-          justify-content: flex-start;
+        .message {
+          max-width: 100%;
         }
       }
     </style>
   </head>
   <body>
-    <main>
-      <section class="card hero">
-        <div class="hero-head">
+    <main id="login-screen" class="login-screen">
+      <section class="panel login-panel">
+        <div class="brand">
+          <div class="brand-mark">G</div>
           <div>
-            <div class="eyebrow">Local Keyword Analysis To Grafana</div>
             <h1>Grafinder</h1>
-            <p>
-              先找到直接网页来源，再抓取正文与结构化数据，最后把“当前状态、变化趋势、数据明细、来源说明”做成一套 Grafana 分析看板。
-            </p>
-          </div>
-          <div class="hero-actions">
-            <button id="open-settings" class="ghost-button" type="button">Settings</button>
+            <span>登录后进入你的数据智能体工作台</span>
           </div>
         </div>
-      </section>
-
-      <section class="card section">
-        <h2 class="section-title">创建分析任务</h2>
-        <form id="task-form">
-          <div class="grid">
-            <label>
-              关键词
-              <input id="keyword" name="keyword" placeholder="例如：锂电池 国内 价格、lithium battery price" required />
-            </label>
-            <label>
-              展示意图
-              <select id="intent" name="intent">
-                <option value="趋势分析">趋势分析</option>
-                <option value="排行分析">排行分析</option>
-                <option value="原始明细">原始明细</option>
-                <option value="自动推荐">自动推荐</option>
-              </select>
-            </label>
-          </div>
+        <form id="login-form">
           <label>
-            来源偏好 / 抓取提示
-            <textarea
-              id="source-hint"
-              name="source_hint"
-              placeholder="可选。用自然语言告诉 Agent 更偏向哪些网站或来源，例如：优先 Mysteel、东方财富、工信部、SMM，不要新闻站；如果有行业月报也可以抓。"
-            ></textarea>
+            用户名
+            <input id="login-username" name="username" autocomplete="username" required />
           </label>
-          <div class="actions">
-            <button type="submit">开始生成 Grafana 分析看板</button>
-            <span class="hint">提交后会新开一个页签，任务完成后自动跳到本地 Grafana。</span>
+          <label>
+            密码
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <label id="register-confirm-wrap" hidden>
+            确认密码
+            <input id="register-confirm-password" name="password_confirm" type="password" autocomplete="new-password" />
+          </label>
+          <button id="login-button" type="submit">登录</button>
+          <div class="button-row auth-switch">
+            <button id="auth-mode-toggle" class="secondary" type="button">注册新用户</button>
           </div>
+          <p id="login-error" class="error"></p>
         </form>
+        <p id="auth-helper" class="hint">默认账号：admin / grafinder_admin。登录后模型 Provider、Base URL、Model 和 API Key 保存到后端数据库。</p>
       </section>
+    </main>
 
-      <section class="card section status-wrap">
-        <div class="status-top">
+    <div id="app-shell" hidden>
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">G</div>
           <div>
-            <span id="status-tag" class="status-tag">等待任务</span>
-            <h2 id="status-title" class="status-title">准备就绪</h2>
-            <p id="status-text" class="hint">输入关键词后即可启动一次完整的数据分析任务。</p>
-          </div>
-          <div class="status-actions">
-            <span id="dashboard-link-wrap" class="hint"></span>
-            <button id="view-sources" class="ghost-button" type="button" disabled>查看抓取来源</button>
+            <h1>Grafinder</h1>
+            <span>对话式数据抓取、结构化抽取与 Grafana 看板生成</span>
           </div>
         </div>
+        <div class="top-actions">
+          <span id="current-user" class="user-chip"></span>
+          <span id="status-tag" class="status-chip">idle</span>
+          <button id="open-settings" class="secondary" type="button">模型设置</button>
+          <button id="logout-button" class="secondary" type="button">退出</button>
+        </div>
+      </header>
 
-        <div class="metrics">
-          <div class="metric">
-            <strong id="metric-sources">0</strong>
-            <span>来源</span>
+      <main class="workspace">
+      <section class="panel chat-panel">
+        <div class="panel-head">
+          <div>
+            <h2>对话工作台</h2>
+            <div class="hint">第一轮创建任务；任务完成后继续对话来修改 Grafana 图表。</div>
           </div>
-          <div class="metric">
-            <strong id="metric-docs">0</strong>
-            <span>页面</span>
-          </div>
-          <div class="metric">
-            <strong id="metric-records">0</strong>
-            <span>结构化记录</span>
-          </div>
-          <div class="metric">
-            <strong id="metric-revision">v1</strong>
-            <span>仪表盘版本</span>
-          </div>
+          <button id="reset-chat" class="secondary" type="button">新任务</button>
         </div>
 
-        <div id="data-note" class="data-note hint">
-          当前看板会优先尝试展示直接数值、变化趋势、来源和明细。如果可分析的数值点不足，会明确提示数据质量。
-        </div>
+        <div id="chat-log" class="chat-log" aria-live="polite"></div>
 
-        <div id="refinement-note-wrap" class="subtle-box" hidden>
-          <strong>最近一次调整</strong>
-          <span id="refinement-note" class="hint"></span>
-        </div>
+        <div class="composer">
+          <form id="task-form">
+            <div class="start-grid">
+              <label>
+                你想分析什么
+                <input id="keyword" name="keyword" placeholder="例如：锂电池历史价格、储能电池装机量、手机型号对比" required />
+              </label>
+              <label>
+                展示意图
+                <select id="intent" name="intent">
+                  <option value="趋势分析">趋势分析</option>
+                  <option value="排行分析">排行分析</option>
+                  <option value="原始明细">原始明细</option>
+                  <option value="自动推荐">自动推荐</option>
+                </select>
+              </label>
+              <label>
+                数据源策略
+                <select id="source-strategy" name="source_strategy">
+                  <option value="trusted_first">公开成套数据优先</option>
+                  <option value="industry_first">行业站与报告优先</option>
+                  <option value="broad_search">广泛搜索兜底</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              数据来源要求
+              <textarea
+                id="source-hint"
+                name="source_hint"
+                placeholder="例如：优先官方统计、行业数据库、可下载表格、历史价格页；不要新闻摘要；需要可追溯来源。"
+              ></textarea>
+            </label>
+            <div class="composer-actions">
+              <span class="hint">建议先说明“历史数据、成套数据、公开来源、不要新闻”。</span>
+              <button id="start-button" type="submit">开始分析</button>
+            </div>
+          </form>
 
-        <p id="error-text" class="error"></p>
+          <form id="chat-form">
+            <label>
+              继续对话修改图表
+              <textarea
+                id="chat-input"
+                name="instruction"
+                placeholder="例如：不要新闻来源分布，改成按月份的价格趋势；表格只保留有数值和来源链接的记录。"
+                disabled
+              ></textarea>
+            </label>
+            <div class="composer-actions">
+              <span id="chat-hint" class="hint">先完成一次任务后，这里会变成改图对话框。</span>
+              <button id="chat-send" type="submit" disabled>发送修改要求</button>
+            </div>
+          </form>
+        </div>
       </section>
 
-      <section class="card section refine-wrap">
-        <h2 class="section-title">继续调整看板</h2>
-        <form id="refine-form">
-          <label>
-            图表不合适时，继续用自然语言调整
-            <textarea
-              id="refine-instruction"
-              name="instruction"
-              placeholder="例如：把当前状态放在左上角；趋势只保留价格相关数值；不要来源分布，改成最近 30 条明细。"
-            ></textarea>
-          </label>
-          <div class="actions">
-            <button id="refine-button" type="submit" disabled>根据反馈重新生成 Grafana 面板</button>
-            <span id="refine-hint" class="hint">先跑出一批结构化数据后，才能根据反馈重新生成图表。</span>
+      <aside class="side-panel">
+        <section class="panel side-section">
+          <div class="button-row">
+            <h2 id="status-title" class="side-title">准备就绪</h2>
+            <span id="revision-chip" class="pill">v1</span>
           </div>
-        </form>
-      </section>
+          <p id="status-text" class="hint">输入分析目标后即可启动任务。</p>
+          <div class="metrics">
+            <div class="metric">
+              <strong id="metric-sources">0</strong>
+              <span>发现来源</span>
+            </div>
+            <div class="metric">
+              <strong id="metric-docs">0</strong>
+              <span>抓取页面</span>
+            </div>
+            <div class="metric">
+              <strong id="metric-records">0</strong>
+              <span>结构化记录</span>
+            </div>
+            <div class="metric">
+              <strong id="metric-quality">--</strong>
+              <span>数据质量</span>
+            </div>
+          </div>
+          <div class="button-row">
+            <a id="dashboard-link" class="button-link" href="#" target="_blank" rel="noreferrer" aria-disabled="true">打开 Grafana</a>
+            <a id="csv-link" class="button-link secondary" href="#" aria-disabled="true">导出 CSV</a>
+            <button id="view-sources" class="secondary" type="button" disabled>查看来源</button>
+          </div>
+          <p id="error-text" class="error"></p>
+        </section>
+
+        <section class="panel side-section">
+          <h2 class="side-title">任务阶段</h2>
+          <div class="phase-list">
+            <div class="phase" data-phase="plan"><span>规划搜索</span><strong>LLM</strong></div>
+            <div class="phase" data-phase="source"><span>寻找可靠来源</span><strong>Search</strong></div>
+            <div class="phase" data-phase="crawl"><span>抓取页面</span><strong>Crawl</strong></div>
+            <div class="phase" data-phase="extract"><span>抽取结构化数据</span><strong>Extract</strong></div>
+            <div class="phase" data-phase="dashboard"><span>生成看板</span><strong>Grafana</strong></div>
+          </div>
+        </section>
+
+        <section class="panel side-section">
+          <h2 class="side-title">数据源策略</h2>
+          <div id="data-note" class="notice warn hint">
+            当前版本会把“公开成套数据优先、不要新闻摘要、需要历史数据”传给规划器。下一步会接入运行时数据源 skill，用目录化数据源和质量评分替代泛搜索。
+          </div>
+        </section>
+      </aside>
     </main>
 
     <dialog id="settings-dialog">
       <div class="dialog-shell">
         <div class="dialog-head">
           <div>
-            <h3>LLM Settings</h3>
-            <p class="hint">这里放 Provider、Model、Base URL、API Key。页面主区只保留任务输入。</p>
+            <h3>模型设置</h3>
+            <p class="hint">Provider、Model、Base URL 和 API Key 会保存到后端数据库，并按当前登录用户隔离。</p>
           </div>
-          <button class="close-button" type="button" data-close-dialog="settings-dialog">关闭</button>
+          <button class="secondary" type="button" data-close-dialog="settings-dialog">关闭</button>
         </div>
         <div class="settings-grid">
           <label>
@@ -560,25 +700,25 @@
           </label>
           <label>
             Model
-            <input id="llm-model" name="llm_model" placeholder="例如：gpt-5.4 / claude-sonnet-4-20250514" />
+            <input id="llm-model" name="llm_model" placeholder="例如：gpt-5.4 / deepseek-chat" />
           </label>
           <label>
             Base URL
             <input id="llm-base-url" name="llm_base_url" placeholder="https://api.openai.com/v1" />
           </label>
-          <label style="grid-column: 1 / -1;">
+          <label style="grid-column: 1 / -1">
             API Key
-            <input id="llm-api-key" name="llm_api_key" type="password" placeholder="可直接复制粘贴，留空则读取环境变量" />
+            <input id="llm-api-key" name="llm_api_key" type="password" placeholder="留空表示继续使用后端已保存密钥或环境变量" />
           </label>
         </div>
         <p id="provider-note" class="hint"></p>
-        <div class="dialog-actions">
-          <div class="dialog-button-group">
-            <button id="test-settings" class="ghost-button" type="button">测试连接</button>
+        <div class="button-row">
+          <div class="button-row">
+            <button id="test-settings" class="secondary" type="button">测试连接</button>
             <button id="save-settings" type="button">保存设置</button>
-            <button id="clear-settings" class="ghost-button" type="button">清空已保存</button>
+            <button id="clear-settings" class="secondary" type="button">清空已保存</button>
           </div>
-          <span id="settings-save-note" class="hint settings-note">可保存到当前浏览器，本机下次打开会自动恢复。</span>
+          <span id="settings-save-note" class="hint">保存后会写入后端数据库，不写入浏览器本地存储。</span>
         </div>
       </div>
     </dialog>
@@ -588,15 +728,30 @@
         <div class="dialog-head">
           <div>
             <h3>抓取来源</h3>
-            <p id="sources-summary" class="hint">这里会列出当前任务发现并抓取过的网页来源。</p>
+            <p id="sources-summary" class="hint">这里会列出当前任务发现和抓取过的网页来源。</p>
           </div>
-          <button class="close-button" type="button" data-close-dialog="sources-dialog">关闭</button>
+          <button class="secondary" type="button" data-close-dialog="sources-dialog">关闭</button>
         </div>
         <div id="source-list" class="source-list"></div>
       </div>
     </dialog>
+    </div>
 
     <script>
+      const loginScreen = document.getElementById("login-screen");
+      const appShell = document.getElementById("app-shell");
+      const loginForm = document.getElementById("login-form");
+      const loginUsernameInput = document.getElementById("login-username");
+      const loginPasswordInput = document.getElementById("login-password");
+      const loginButton = document.getElementById("login-button");
+      const loginError = document.getElementById("login-error");
+      const registerConfirmWrap = document.getElementById("register-confirm-wrap");
+      const registerConfirmPasswordInput = document.getElementById("register-confirm-password");
+      const authModeToggle = document.getElementById("auth-mode-toggle");
+      const authHelper = document.getElementById("auth-helper");
+      const currentUserLabel = document.getElementById("current-user");
+      const logoutButton = document.getElementById("logout-button");
+
       const providerSelect = document.getElementById("llm-provider");
       const modelPresetSelect = document.getElementById("llm-model-preset");
       const modelInput = document.getElementById("llm-model");
@@ -608,23 +763,26 @@
       const clearSettingsButton = document.getElementById("clear-settings");
       const settingsSaveNote = document.getElementById("settings-save-note");
 
+      const chatLog = document.getElementById("chat-log");
+      const taskForm = document.getElementById("task-form");
+      const chatForm = document.getElementById("chat-form");
+      const chatInput = document.getElementById("chat-input");
+      const chatSend = document.getElementById("chat-send");
+      const chatHint = document.getElementById("chat-hint");
+      const startButton = document.getElementById("start-button");
+
       const statusTag = document.getElementById("status-tag");
       const statusTitle = document.getElementById("status-title");
       const statusText = document.getElementById("status-text");
       const sourcesMetric = document.getElementById("metric-sources");
       const docsMetric = document.getElementById("metric-docs");
       const recordsMetric = document.getElementById("metric-records");
-      const revisionMetric = document.getElementById("metric-revision");
-      const dashboardLinkWrap = document.getElementById("dashboard-link-wrap");
+      const qualityMetric = document.getElementById("metric-quality");
+      const revisionChip = document.getElementById("revision-chip");
+      const dashboardLink = document.getElementById("dashboard-link");
+      const csvLink = document.getElementById("csv-link");
       const errorText = document.getElementById("error-text");
       const dataNote = document.getElementById("data-note");
-
-      const refineForm = document.getElementById("refine-form");
-      const refineButton = document.getElementById("refine-button");
-      const refineHint = document.getElementById("refine-hint");
-      const refineInstruction = document.getElementById("refine-instruction");
-      const refinementNoteWrap = document.getElementById("refinement-note-wrap");
-      const refinementNote = document.getElementById("refinement-note");
 
       const settingsDialog = document.getElementById("settings-dialog");
       const sourcesDialog = document.getElementById("sources-dialog");
@@ -633,11 +791,47 @@
       const sourcesSummary = document.getElementById("sources-summary");
 
       let providerIndex = {};
-      let grafanaWindow = null;
       let pollTimer = null;
       let currentTaskId = null;
       let currentTask = null;
-      const llmSettingsStorageKey = "grafinder.llmSettings.v1";
+      let currentUser = null;
+      let authMode = "login";
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function nowLabel() {
+        return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+
+      function addMessage(role, text, meta = nowLabel()) {
+        const item = document.createElement("article");
+        item.className = `message ${role}`;
+        item.innerHTML = `
+          <div class="bubble">${escapeHtml(text)}</div>
+          <div class="message-meta">${escapeHtml(meta)}</div>
+        `;
+        chatLog.appendChild(item);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function resetConversation() {
+        clearInterval(pollTimer);
+        currentTaskId = null;
+        currentTask = null;
+        chatLog.innerHTML = "";
+        addMessage(
+          "assistant",
+          "你好，我是 Grafinder。告诉我要分析什么，我会优先寻找公开、成套、可追溯的数据源，再生成 Grafana 看板。"
+        );
+        setIdleStatus();
+      }
 
       function openDialog(dialog) {
         if (typeof dialog.showModal === "function") {
@@ -652,8 +846,49 @@
         }
       }
 
+      function showLogin(message = "") {
+        clearInterval(pollTimer);
+        currentUser = null;
+        currentUserLabel.textContent = "";
+        appShell.hidden = true;
+        loginScreen.hidden = false;
+        loginError.textContent = message;
+        loginPasswordInput.value = "";
+        registerConfirmPasswordInput.value = "";
+        setAuthMode("login");
+        loginUsernameInput.focus();
+      }
+
+      function setAuthMode(mode) {
+        authMode = mode;
+        const isRegistering = mode === "register";
+        registerConfirmWrap.hidden = !isRegistering;
+        registerConfirmPasswordInput.required = isRegistering;
+        loginButton.textContent = isRegistering ? "注册并登录" : "登录";
+        authModeToggle.textContent = isRegistering ? "返回登录" : "注册新用户";
+        authHelper.textContent = isRegistering
+          ? "注册后会自动登录。每个用户都有独立的模型 Provider、Base URL、Model 和 API Key 设置。"
+          : "默认账号：admin / grafinder_admin。登录后模型 Provider、Base URL、Model 和 API Key 保存到后端数据库。";
+      }
+
+      function showApp(username) {
+        currentUser = username;
+        currentUserLabel.textContent = `用户：${username}`;
+        loginScreen.hidden = true;
+        appShell.hidden = false;
+      }
+
+      async function apiFetch(url, options = {}) {
+        const response = await fetch(url, options);
+        if (response.status === 401) {
+          showLogin("登录已过期，请重新登录。");
+          throw new Error("请先登录。");
+        }
+        return response;
+      }
+
       async function loadMeta() {
-        const response = await fetch("/api/meta");
+        const response = await apiFetch("/api/meta");
         const meta = await response.json();
         providerIndex = {};
         providerSelect.innerHTML = "";
@@ -669,8 +904,19 @@
           providerSelect.appendChild(option);
         });
 
+        const intentSelect = document.getElementById("intent");
+        if (Array.isArray(meta.intent_options) && meta.intent_options.length > 0) {
+          intentSelect.innerHTML = "";
+          meta.intent_options.forEach((intent) => {
+            const option = document.createElement("option");
+            option.value = intent;
+            option.textContent = intent;
+            intentSelect.appendChild(option);
+          });
+        }
+
         applyProviderDefaults();
-        loadSavedSettings();
+        await loadSavedSettings();
       }
 
       function applyProviderDefaults() {
@@ -701,90 +947,102 @@
 
       function setSettingsSaveNote(message, state = "default") {
         settingsSaveNote.textContent = message;
-        settingsSaveNote.className = `hint settings-note${state !== "default" ? ` ${state}` : ""}`;
-      }
-
-      function readSavedSettings() {
-        try {
-          const raw = window.localStorage.getItem(llmSettingsStorageKey);
-          return raw ? JSON.parse(raw) : null;
-        } catch (error) {
-          setSettingsSaveNote("浏览器本地保存不可用，请直接使用当前页面设置。", "error");
-          return null;
+        settingsSaveNote.className = "hint";
+        if (state === "error") {
+          settingsSaveNote.style.color = "var(--danger)";
+        } else if (state === "saved") {
+          settingsSaveNote.style.color = "var(--accent-dark)";
+        } else {
+          settingsSaveNote.style.color = "var(--muted)";
         }
       }
 
       function currentSettingsPayload() {
         return {
-          provider: providerSelect.value || null,
-          model_preset: modelPresetSelect.value || null,
-          model: modelInput.value.trim() || null,
-          base_url: baseUrlInput.value.trim() || null,
-          api_key: apiKeyInput.value || "",
+          llm_provider: providerSelect.value || null,
+          llm_model_preset: modelPresetSelect.value || null,
+          llm_model: modelInput.value.trim() || null,
+          llm_base_url: baseUrlInput.value.trim() || null,
+          llm_api_key: apiKeyInput.value || null,
         };
       }
 
       function applySavedSettings(saved) {
         if (!saved || typeof saved !== "object") return;
-
-        if (saved.provider && providerIndex[saved.provider]) {
-          providerSelect.value = saved.provider;
+        if (saved.llm_provider && providerIndex[saved.llm_provider]) {
+          providerSelect.value = saved.llm_provider;
         }
         applyProviderDefaults();
-
-        if (saved.model) {
-          modelInput.value = saved.model;
-        }
-        if (saved.base_url) {
-          baseUrlInput.value = saved.base_url;
-        }
-        if (typeof saved.api_key === "string") {
-          apiKeyInput.value = saved.api_key;
-        }
+        if (saved.llm_model) modelInput.value = saved.llm_model;
+        if (saved.llm_base_url) baseUrlInput.value = saved.llm_base_url;
+        apiKeyInput.value = "";
+        apiKeyInput.placeholder = saved.has_api_key
+          ? "后端已保存 API Key；留空表示继续使用已保存密钥"
+          : "留空表示读取环境变量；填写后点击保存会写入后端数据库";
 
         const optionValues = Array.from(modelPresetSelect.options).map((option) => option.value);
-        if (saved.model_preset && optionValues.includes(saved.model_preset)) {
-          modelPresetSelect.value = saved.model_preset;
+        if (saved.llm_model_preset && optionValues.includes(saved.llm_model_preset)) {
+          modelPresetSelect.value = saved.llm_model_preset;
         } else {
           syncModelPreset();
         }
       }
 
-      function loadSavedSettings() {
-        const saved = readSavedSettings();
-        if (!saved) {
-          setSettingsSaveNote("可保存到当前浏览器，本机下次打开会自动恢复。", "default");
-          return;
-        }
+      async function loadSavedSettings() {
+        const response = await apiFetch("/api/me/llm-settings");
+        const saved = await response.json();
         applySavedSettings(saved);
-        setSettingsSaveNote("已自动加载上次保存的 LLM 设置。公共电脑请不要保存 API Key。", "saved");
-      }
-
-      function saveSettings() {
-        try {
-          window.localStorage.setItem(llmSettingsStorageKey, JSON.stringify(currentSettingsPayload()));
-          setSettingsSaveNote("已保存到当前浏览器。刷新页面后也会自动恢复。", "saved");
-        } catch (error) {
-          setSettingsSaveNote("保存失败：浏览器不允许写入本地存储。", "error");
+        if (saved.has_api_key || saved.llm_provider || saved.llm_model || saved.llm_base_url) {
+          setSettingsSaveNote("已加载当前用户保存在后端数据库里的模型设置。", "saved");
+        } else {
+          setSettingsSaveNote("当前用户还没有保存模型设置；会先使用服务端环境变量/默认 Provider。");
         }
       }
 
-      function clearSavedSettings() {
+      async function saveSettings() {
+        saveSettingsButton.disabled = true;
+        setSettingsSaveNote("正在保存到后端数据库...");
         try {
-          window.localStorage.removeItem(llmSettingsStorageKey);
+          const response = await apiFetch("/api/me/llm-settings", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(currentSettingsPayload()),
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.detail || "保存设置失败。");
+          }
+          applySavedSettings(result);
+          setSettingsSaveNote("已保存到后端数据库。API Key 不会回显到页面。", "saved");
         } catch (error) {
-          setSettingsSaveNote("清空失败：浏览器不允许操作本地存储。", "error");
-          return;
+          setSettingsSaveNote(`保存失败：${error.message}`, "error");
+        } finally {
+          saveSettingsButton.disabled = false;
         }
+      }
 
-        applyProviderDefaults();
-        apiKeyInput.value = "";
-        syncModelPreset();
-        setSettingsSaveNote("已清空浏览器里保存的 LLM 设置。当前已恢复为默认值。", "saved");
+      async function clearSavedSettings() {
+        clearSettingsButton.disabled = true;
+        setSettingsSaveNote("正在清空后端保存的模型设置...");
+        try {
+          const response = await apiFetch("/api/me/llm-settings", { method: "DELETE" });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.detail || "清空设置失败。");
+          }
+          applyProviderDefaults();
+          applySavedSettings(result);
+          syncModelPreset();
+          setSettingsSaveNote("已清空后端数据库里的当前用户模型设置。", "saved");
+        } catch (error) {
+          setSettingsSaveNote(`清空失败：${error.message}`, "error");
+        } finally {
+          clearSettingsButton.disabled = false;
+        }
       }
 
       function markSettingsDirty() {
-        setSettingsSaveNote("当前修改尚未保存到浏览器。点击“保存设置”后才会在下次自动恢复。", "default");
+        setSettingsSaveNote("当前修改尚未保存到后端。点击“保存设置”后才会用于当前用户的默认调用。");
       }
 
       async function testSettingsConnection() {
@@ -796,26 +1054,19 @@
         };
 
         testSettingsButton.disabled = true;
-        setSettingsSaveNote("正在测试当前 LLM 设置连通性...", "default");
-
+        setSettingsSaveNote("正在测试当前 LLM 设置连通性...");
         try {
-          const response = await fetch("/api/llm/test", {
+          const response = await apiFetch("/api/llm/test", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
-
           const result = await response.json();
           if (!response.ok) {
-            const detail = result?.detail || "连接测试失败。";
-            setSettingsSaveNote(`测试失败：${detail}`, "error");
+            setSettingsSaveNote(`测试失败：${result?.detail || "连接测试失败。"}`, "error");
             return;
           }
-
-          setSettingsSaveNote(
-            `连接成功：${result.provider} / ${result.model}，耗时 ${result.latency_ms} ms。${result.message} 如需下次自动恢复，请再点“保存设置”。`,
-            "saved",
-          );
+          setSettingsSaveNote(`连接成功：${result.provider} / ${result.model}，耗时 ${result.latency_ms} ms。`, "saved");
         } catch (error) {
           setSettingsSaveNote(`测试失败：${error.message}`, "error");
         } finally {
@@ -829,25 +1080,68 @@
         modelPresetSelect.value = options.includes(currentModel) ? currentModel : "__custom__";
       }
 
-      function renderDashboardLink(task) {
-        if (task.dashboard_url) {
-          dashboardLinkWrap.innerHTML = `<a class="grafana-link" href="${task.dashboard_url}" target="_blank" rel="noreferrer">打开 Grafana 看板</a>`;
-        } else {
-          dashboardLinkWrap.textContent = "";
+      function strategyInstruction(strategy) {
+        const base = "优先公开网站、官方统计、行业数据库、可下载表格、历史数据页、价格指数页、报告附表；不要把新闻摘要作为主要数据来源；需要成套历史数据和可追溯来源；如果找不到足够历史数据，请明确说明数据不足。";
+        if (strategy === "industry_first") {
+          return `${base} 行业站、研究报告、数据中心优先，其次再看公开新闻背景。`;
+        }
+        if (strategy === "broad_search") {
+          return "先尽量找公开成套数据源；如果不足，可以扩展到报告、网页表格和新闻背景，但需要标注数据质量。";
+        }
+        return base;
+      }
+
+      function buildSourceHint() {
+        const strategy = document.getElementById("source-strategy").value;
+        const userHint = document.getElementById("source-hint").value.trim();
+        return [strategyInstruction(strategy), userHint].filter(Boolean).join("\n");
+      }
+
+      function settingsPayload() {
+        return {
+          llm_provider: providerSelect.value || null,
+          llm_model: modelInput.value || null,
+          llm_base_url: baseUrlInput.value || null,
+        };
+      }
+
+      function setIdleStatus() {
+        statusTag.textContent = "idle";
+        statusTag.className = "status-chip";
+        statusTitle.textContent = "准备就绪";
+        statusText.textContent = "输入分析目标后即可启动任务。";
+        sourcesMetric.textContent = "0";
+        docsMetric.textContent = "0";
+        recordsMetric.textContent = "0";
+        qualityMetric.textContent = "--";
+        revisionChip.textContent = "v1";
+        errorText.textContent = "";
+        dashboardLink.href = "#";
+        dashboardLink.setAttribute("aria-disabled", "true");
+        csvLink.href = "#";
+        csvLink.setAttribute("aria-disabled", "true");
+        sourcesButton.disabled = true;
+        chatInput.disabled = true;
+        chatSend.disabled = true;
+        chatHint.textContent = "先完成一次任务后，这里会变成改图对话框。";
+        updatePhase("idle");
+      }
+
+      function updatePhase(status) {
+        document.querySelectorAll(".phase").forEach((node) => node.classList.remove("active"));
+        if (status === "running") {
+          document.querySelectorAll(".phase").forEach((node) => node.classList.add("active"));
+        }
+        if (status === "completed") {
+          document.querySelector('[data-phase="dashboard"]')?.classList.add("active");
         }
       }
 
-      function renderDataNote(task) {
-        const description = task.dashboard_payload?.description;
-        if (description) {
-          dataNote.textContent = description;
-          return;
-        }
-        if (task.summary) {
-          dataNote.textContent = task.summary;
-          return;
-        }
-        dataNote.textContent = "当前看板会优先尝试展示直接数值、变化趋势、来源和明细。";
+      function qualityLabel(task) {
+        if (!task || task.records_count === 0) return "--";
+        if (task.records_count >= 20 && task.documents_count >= 3) return "较好";
+        if (task.records_count >= 5) return "一般";
+        return "偏少";
       }
 
       function setStatus(task) {
@@ -855,60 +1149,84 @@
         currentTask = task;
         const failed = task.status === "failed";
         statusTag.textContent = task.status;
-        statusTag.className = failed ? "status-tag failed" : "status-tag";
+        statusTag.className = failed ? "status-chip failed" : "status-chip";
         statusTitle.textContent = `${task.keyword} / ${task.intent}`;
-        statusText.textContent = task.summary || "任务执行中...";
+        statusText.textContent = task.summary || (task.status === "running" ? "任务执行中..." : "等待任务结果。");
         sourcesMetric.textContent = task.sources_count ?? 0;
         docsMetric.textContent = task.documents_count ?? 0;
         recordsMetric.textContent = task.records_count ?? 0;
-        revisionMetric.textContent = `v${task.dashboard_revision ?? 1}`;
+        qualityMetric.textContent = qualityLabel(task);
+        revisionChip.textContent = `v${task.dashboard_revision ?? 1}`;
         errorText.textContent = task.error_message || "";
-        renderDashboardLink(task);
-        renderDataNote(task);
+        updatePhase(task.status);
 
-        refineButton.disabled = !task.id || task.status === "running" || task.records_count === 0;
-        refineHint.textContent =
-          task.records_count > 0
-            ? "直接描述你想怎么改图，Grafinder 会基于已入库数据重建同一个 Grafana Dashboard。"
-            : "先跑出一批结构化数据后，才能根据反馈重新生成图表。";
+        if (task.dashboard_url) {
+          dashboardLink.href = task.dashboard_url;
+          dashboardLink.removeAttribute("aria-disabled");
+        } else {
+          dashboardLink.href = "#";
+          dashboardLink.setAttribute("aria-disabled", "true");
+        }
+
+        if ((task.records_count ?? 0) > 0) {
+          csvLink.href = `/api/tasks/${task.id}/records.csv`;
+          csvLink.removeAttribute("aria-disabled");
+        } else {
+          csvLink.href = "#";
+          csvLink.setAttribute("aria-disabled", "true");
+        }
 
         sourcesButton.disabled = !task.id || (task.sources_count ?? 0) === 0;
+        const canChat = task.id && task.status !== "running" && (task.records_count ?? 0) > 0;
+        chatInput.disabled = !canChat;
+        chatSend.disabled = !canChat;
+        chatHint.textContent = canChat
+          ? "继续描述你想怎么改图，系统会复用已入库数据重建同一个 Grafana Dashboard。"
+          : "需要先跑出结构化数据，才能继续对话改图。";
 
-        if (task.last_refinement_instruction) {
-          refinementNoteWrap.hidden = false;
-          refinementNote.textContent = task.last_refinement_instruction;
-        } else {
-          refinementNoteWrap.hidden = true;
-          refinementNote.textContent = "";
+        if (task.dashboard_payload?.description) {
+          dataNote.textContent = task.dashboard_payload.description;
+          dataNote.className = "notice hint";
+        } else if (task.summary) {
+          dataNote.textContent = task.summary;
+          dataNote.className = "notice hint";
         }
       }
 
       async function pollTask(taskId) {
-        const response = await fetch(`/api/tasks/${taskId}`);
+        const previousStatus = currentTask?.status;
+        const response = await apiFetch(`/api/tasks/${taskId}`);
         const task = await response.json();
+        if (!response.ok) {
+          throw new Error(task.detail || "任务状态读取失败。");
+        }
         setStatus(task);
 
         if (task.status === "completed") {
           clearInterval(pollTimer);
-          if (grafanaWindow && task.dashboard_url) {
-            grafanaWindow.location = task.dashboard_url;
-            grafanaWindow.focus();
+          if (previousStatus !== "completed") {
+            addMessage(
+              "assistant",
+              `任务完成。发现 ${task.sources_count} 个来源，抓取 ${task.documents_count} 个页面，抽取 ${task.records_count} 条结构化记录。你可以打开 Grafana、导出 CSV，或者继续告诉我怎么改图。`
+            );
           }
+          startButton.disabled = false;
           return;
         }
 
         if (task.status === "failed") {
           clearInterval(pollTimer);
-          if (grafanaWindow && !grafanaWindow.closed) {
-            grafanaWindow.document.body.innerHTML =
-              `<div style="font-family: sans-serif; padding: 24px;"><h2>任务失败</h2><p>${task.error_message || "Unknown error"}</p></div>`;
-          }
+          addMessage("assistant", `任务失败：${task.error_message || "未知错误"}`);
+          startButton.disabled = false;
         }
       }
 
       async function loadSources(taskId) {
-        const response = await fetch(`/api/tasks/${taskId}/sources`);
+        const response = await apiFetch(`/api/tasks/${taskId}/sources`);
         const sources = await response.json();
+        if (!response.ok) {
+          throw new Error(sources.detail || "来源读取失败。");
+        }
         sourceList.innerHTML = "";
 
         const modeLabels = {
@@ -921,30 +1239,38 @@
           httpx_fallback: "HTTP 回退抓取",
           google_news_rss: "Google News RSS",
         };
+        const typeLabels = {
+          official: "官方",
+          industry_data: "行业数据",
+          report: "报告",
+          news: "新闻",
+          unknown: "未知",
+        };
 
         const directCount = sources.filter((item) => item.crawl_mode === "page_crawled").length;
         const rssCount = sources.filter((item) => item.crawl_mode === "rss_summary_fallback").length;
-        const crawl4aiCount = sources.filter((item) => item.document_crawl_engine === "crawl4ai").length;
-        const fallbackCount = sources.filter((item) => item.document_crawl_engine === "httpx_fallback").length;
-        sourcesSummary.textContent = `共 ${sources.length} 个来源，直接网页抓取 ${directCount} 个，其中 Crawl4AI ${crawl4aiCount} 个，HTTP 回退 ${fallbackCount} 个，RSS 摘要回退 ${rssCount} 个。`;
+        sourcesSummary.textContent = `共 ${sources.length} 个来源，直接抓取 ${directCount} 个，RSS 摘要回退 ${rssCount} 个。`;
 
         sources.forEach((item) => {
+          const quality = item.source_quality_score != null ? `${item.source_quality_score}分` : "未评分";
+          const typeLabel = typeLabels[item.source_type] || item.source_type || "未分类";
           const article = document.createElement("article");
           article.className = "source-item";
           article.innerHTML = `
             <div>
-              <h4>${item.title}</h4>
+              <h4>${escapeHtml(item.title)}</h4>
               <div class="source-meta">
-                <span class="pill">#${item.rank}</span>
-                <span class="pill">${modeLabels[item.crawl_mode] || item.crawl_mode}</span>
-                ${item.domain ? `<span class="pill">${item.domain}</span>` : ""}
-                ${item.document_source_name ? `<span class="pill">${item.document_source_name}</span>` : ""}
-                ${item.document_crawl_engine ? `<span class="pill">${engineLabels[item.document_crawl_engine] || item.document_crawl_engine}</span>` : ""}
+                <span class="pill">#${escapeHtml(item.rank)}</span>
+                <span class="pill">${escapeHtml(modeLabels[item.crawl_mode] || item.crawl_mode)}</span>
+                <span class="pill">${escapeHtml(typeLabel)}</span>
+                <span class="pill ${item.source_quality_score && item.source_quality_score < 50 ? "warn" : ""}">${escapeHtml(quality)}</span>
+                ${item.domain ? `<span class="pill">${escapeHtml(item.domain)}</span>` : ""}
+                ${item.document_crawl_engine ? `<span class="pill">${escapeHtml(engineLabels[item.document_crawl_engine] || item.document_crawl_engine)}</span>` : ""}
               </div>
             </div>
-            <div class="hint">${item.document_summary || item.snippet || "暂无摘要。"}</div>
-            <div class="source-actions">
-              <a class="grafana-link" href="${item.url}" target="_blank" rel="noreferrer">打开来源网页</a>
+            <div class="hint">${escapeHtml(item.source_quality_reason || item.document_summary || item.snippet || "暂无摘要。")}</div>
+            <div class="button-row">
+              <a class="button-link secondary" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">打开来源网页</a>
             </div>
           `;
           sourceList.appendChild(article);
@@ -970,8 +1296,51 @@
       testSettingsButton.addEventListener("click", testSettingsConnection);
       saveSettingsButton.addEventListener("click", saveSettings);
       clearSettingsButton.addEventListener("click", clearSavedSettings);
+      authModeToggle.addEventListener("click", () => {
+        loginError.textContent = "";
+        registerConfirmPasswordInput.value = "";
+        setAuthMode(authMode === "login" ? "register" : "login");
+      });
+      logoutButton.addEventListener("click", async () => {
+        try {
+          await fetch("/api/logout", { method: "POST" });
+        } finally {
+          showLogin("");
+        }
+      });
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        loginError.textContent = "";
+        loginButton.disabled = true;
+        try {
+          if (authMode === "register" && loginPasswordInput.value !== registerConfirmPasswordInput.value) {
+            throw new Error("两次输入的密码不一致。");
+          }
+          const response = await fetch(authMode === "register" ? "/api/register" : "/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: loginUsernameInput.value.trim(),
+              password: loginPasswordInput.value,
+            }),
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.detail || "登录失败。");
+          }
+          showApp(result.username);
+          resetConversation();
+          await loadMeta();
+        } catch (error) {
+          loginError.textContent = error.message;
+        } finally {
+          loginButton.disabled = false;
+        }
+      });
 
       document.getElementById("open-settings").addEventListener("click", () => openDialog(settingsDialog));
+      document.getElementById("reset-chat").addEventListener("click", resetConversation);
       document.querySelectorAll("[data-close-dialog]").forEach((button) => {
         button.addEventListener("click", () => closeDialogById(button.dataset.closeDialog));
       });
@@ -982,129 +1351,120 @@
         openDialog(sourcesDialog);
       });
 
-      document.getElementById("task-form").addEventListener("submit", async (event) => {
+      taskForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         clearInterval(pollTimer);
-        currentTaskId = null;
-        currentTask = null;
-        grafanaWindow = window.open("", "_blank");
-        if (grafanaWindow) {
-          grafanaWindow.document.write(
-            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 看板生成中</h2><p>Agent 正在搜索直接来源、抓取网页、抽取结构化数据并构建本地 Grafana 分析看板。</p></div>"
-          );
-        }
-
-        statusTag.className = "status-tag";
-        statusTag.textContent = "submitting";
-        statusTitle.textContent = "任务已提交";
-        statusText.textContent = "正在创建任务...";
-        dashboardLinkWrap.textContent = "";
         errorText.textContent = "";
-        dataNote.textContent = "任务已提交，正在优先发现可分析的数据源。";
-        sourcesButton.disabled = true;
+
+        const keyword = document.getElementById("keyword").value.trim();
+        const intent = document.getElementById("intent").value;
+        const sourceStrategy = document.getElementById("source-strategy").value;
+        if (!keyword) return;
+
+        addMessage("user", `请分析：${keyword}\n展示意图：${intent}\n数据源策略：${document.getElementById("source-strategy").selectedOptions[0].textContent}`);
+        addMessage("assistant", "收到。我会先规划搜索，再优先寻找公开、成套、可追溯的数据源。");
+
+        startButton.disabled = true;
+        statusTag.textContent = "submitting";
+        statusText.textContent = "正在创建任务...";
+        updatePhase("running");
 
         const payload = {
-          keyword: document.getElementById("keyword").value,
-          intent: document.getElementById("intent").value,
-          source_hint: document.getElementById("source-hint").value || null,
-          llm_provider: providerSelect.value || null,
-          llm_model: modelInput.value || null,
-          llm_base_url: baseUrlInput.value || null,
-          llm_api_key: apiKeyInput.value || null,
+          keyword,
+          intent,
+          source_strategy: sourceStrategy,
+          source_hint: buildSourceHint(),
+          ...settingsPayload(),
         };
 
-        const response = await fetch("/api/tasks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          const detail = await response.json();
-          statusTag.textContent = "failed";
-          statusTag.className = "status-tag failed";
-          statusTitle.textContent = "任务创建失败";
-          statusText.textContent = "请检查 Settings 里的 Provider 配置后重试。";
-          errorText.textContent = detail.detail || "Unknown error";
-          if (grafanaWindow && !grafanaWindow.closed) {
-            grafanaWindow.close();
-          }
-          return;
-        }
-
-        const task = await response.json();
-        setStatus(task);
-        pollTimer = setInterval(() => {
-          pollTask(task.id).catch((error) => {
-            clearInterval(pollTimer);
-            errorText.textContent = error.message;
+        try {
+          const response = await apiFetch("/api/tasks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
           });
-        }, 3000);
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.detail || "任务创建失败。");
+          }
+          setStatus(result);
+          pollTimer = setInterval(() => {
+            pollTask(result.id).catch((error) => {
+              clearInterval(pollTimer);
+              errorText.textContent = error.message;
+              addMessage("assistant", `轮询任务失败：${error.message}`);
+              startButton.disabled = false;
+            });
+          }, 3000);
+        } catch (error) {
+          statusTag.textContent = "failed";
+          statusTag.className = "status-chip failed";
+          errorText.textContent = error.message;
+          addMessage("assistant", `任务创建失败：${error.message}`);
+          startButton.disabled = false;
+        }
       });
 
-      refineForm.addEventListener("submit", async (event) => {
+      chatForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         if (!currentTaskId) {
-          errorText.textContent = "请先创建并完成一个任务。";
+          addMessage("assistant", "请先创建并完成一个任务。");
           return;
         }
 
-        const instruction = refineInstruction.value.trim();
-        if (!instruction) {
-          errorText.textContent = "请输入你希望如何调整图表。";
-          return;
-        }
+        const instruction = chatInput.value.trim();
+        if (!instruction) return;
 
         clearInterval(pollTimer);
-        if (!grafanaWindow || grafanaWindow.closed) {
-          grafanaWindow = window.open("", "_blank");
-        }
-        if (grafanaWindow) {
-          grafanaWindow.document.write(
-            "<div style='font-family: sans-serif; padding: 24px; line-height: 1.7;'><h2>Grafana 看板调整中</h2><p>Agent 正在根据你的自然语言反馈，基于当前数据库里的结果重新设计 Grafana 分析看板。</p></div>"
-          );
-        }
-
+        addMessage("user", instruction);
+        addMessage("assistant", "我会基于当前已入库的数据重新设计 Grafana 面板。");
+        chatInput.value = "";
+        chatInput.disabled = true;
+        chatSend.disabled = true;
         errorText.textContent = "";
-        refineButton.disabled = true;
-        statusTag.className = "status-tag";
-        statusTag.textContent = "running";
-        statusText.textContent = "正在根据反馈重新生成 Grafana 面板...";
 
-        const payload = {
-          instruction,
-          llm_provider: providerSelect.value || null,
-          llm_model: modelInput.value || null,
-          llm_base_url: baseUrlInput.value || null,
-          llm_api_key: apiKeyInput.value || null,
-        };
-
-        const response = await fetch(`/api/tasks/${currentTaskId}/refine`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          const detail = await response.json();
-          refineButton.disabled = false;
-          errorText.textContent = detail.detail || "无法重新生成 Grafana 面板。";
-          return;
-        }
-
-        const task = await response.json();
-        setStatus(task);
-        pollTimer = setInterval(() => {
-          pollTask(task.id).catch((error) => {
-            clearInterval(pollTimer);
-            errorText.textContent = error.message;
+        try {
+          const response = await apiFetch(`/api/tasks/${currentTaskId}/refine`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ instruction, ...settingsPayload() }),
           });
-        }, 3000);
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.detail || "无法重新生成 Grafana 面板。");
+          }
+          setStatus(result);
+          pollTimer = setInterval(() => {
+            pollTask(result.id).catch((error) => {
+              clearInterval(pollTimer);
+              errorText.textContent = error.message;
+              addMessage("assistant", `轮询任务失败：${error.message}`);
+            });
+          }, 3000);
+        } catch (error) {
+          errorText.textContent = error.message;
+          addMessage("assistant", `改图失败：${error.message}`);
+          if (currentTask) setStatus(currentTask);
+        }
       });
 
-      loadMeta().catch((error) => {
-        errorText.textContent = error.message;
-      });
+      async function boot() {
+        try {
+          const response = await fetch("/api/session");
+          const session = await response.json();
+          if (!session.authenticated) {
+            showLogin("");
+            return;
+          }
+          showApp(session.username);
+          resetConversation();
+          await loadMeta();
+        } catch (error) {
+          showLogin(`初始化失败：${error.message}`);
+        }
+      }
+
+      boot();
     </script>
   </body>
 </html>

@@ -18,13 +18,48 @@ class TaskStatus(str, enum.Enum):
     failed = "failed"
 
 
+class UserAccount(Base):
+    __tablename__ = "user_accounts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(Text)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    llm_settings: Mapped["UserLLMSettings | None"] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
+
+
+class UserLLMSettings(Base):
+    __tablename__ = "user_llm_settings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user_accounts.id", ondelete="CASCADE"), unique=True, index=True)
+    llm_provider: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    llm_model: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    llm_model_preset: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    llm_base_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    llm_api_key: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    user: Mapped[UserAccount] = relationship(back_populates="llm_settings")
+
+
 class IngestionTask(Base):
     __tablename__ = "ingestion_tasks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_username: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     keyword: Mapped[str] = mapped_column(String(255), index=True)
     intent: Mapped[str] = mapped_column(String(120))
     source_hint: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_strategy: Mapped[str] = mapped_column(String(32), default="trusted_first")
     llm_provider: Mapped[str] = mapped_column(String(64))
     llm_model: Mapped[str] = mapped_column(String(255))
     llm_base_url: Mapped[str] = mapped_column(Text)
@@ -55,6 +90,10 @@ class SourceCandidate(Base):
     title: Mapped[str] = mapped_column(String(500))
     snippet: Mapped[str | None] = mapped_column(Text, nullable=True)
     domain: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    source_type: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source_quality_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    source_quality_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    catalog_source_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     rank: Mapped[int] = mapped_column(Integer)
     selected: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -111,3 +150,19 @@ class ExtractedRecord(Base):
 
     task: Mapped[IngestionTask] = relationship(back_populates="records")
     document: Mapped[Document] = relationship(back_populates="records")
+
+
+class DataSourceCatalog(Base):
+    __tablename__ = "data_source_catalog"
+    __table_args__ = (UniqueConstraint("domain", "source_type", name="uq_data_source_domain_type"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255))
+    domain: Mapped[str] = mapped_column(String(255), index=True)
+    source_type: Mapped[str] = mapped_column(String(64), index=True)
+    quality_score: Mapped[int] = mapped_column(Integer, default=70)
+    topic_keywords: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    query_templates: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -30,19 +30,77 @@ class LLMRuntimeConfig(BaseModel):
     json_mode: JsonOutputMode = "auto"
 
 
+class LoginRequest(BaseModel):
+    username: str = Field(min_length=1, max_length=128)
+    password: str = Field(min_length=1, max_length=255)
+
+    @field_validator("username", mode="before")
+    @classmethod
+    def trim_username(cls, value: str) -> str:
+        return value.strip() if isinstance(value, str) else value
+
+
+class RegisterRequest(BaseModel):
+    username: str = Field(min_length=2, max_length=128)
+    password: str = Field(min_length=6, max_length=255)
+
+    @field_validator("username", mode="before")
+    @classmethod
+    def trim_register_username(cls, value: str) -> str:
+        return value.strip() if isinstance(value, str) else value
+
+    @field_validator("username")
+    @classmethod
+    def username_without_whitespace(cls, value: str) -> str:
+        if any(char.isspace() for char in value):
+            raise ValueError("用户名不能包含空格。")
+        return value
+
+
+class SessionRead(BaseModel):
+    authenticated: bool
+    username: str | None = None
+
+
+class UserLLMSettingsRead(BaseModel):
+    llm_provider: str | None = None
+    llm_model: str | None = None
+    llm_model_preset: str | None = None
+    llm_base_url: str | None = None
+    has_api_key: bool = False
+
+
+class UserLLMSettingsUpdate(BaseModel):
+    llm_provider: str | None = None
+    llm_model: str | None = None
+    llm_model_preset: str | None = None
+    llm_base_url: str | None = None
+    llm_api_key: str | None = None
+    clear_api_key: bool = False
+
+    @field_validator("llm_provider", "llm_model", "llm_model_preset", "llm_base_url", "llm_api_key", mode="before")
+    @classmethod
+    def blank_to_none_for_settings(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        stripped = value.strip()
+        return stripped or None
+
+
 class TaskCreate(BaseModel):
     keyword: str = Field(min_length=1, max_length=255)
     intent: str = Field(min_length=1, max_length=120)
     source_hint: str | None = Field(default=None, max_length=1000)
+    source_strategy: str = Field(default="trusted_first", max_length=32)
     llm_provider: str | None = None
     llm_base_url: str | None = None
     llm_model: str | None = None
     llm_api_key: str | None = None
 
-    @field_validator("keyword", "intent", mode="before")
+    @field_validator("keyword", "intent", "source_strategy", mode="before")
     @classmethod
     def trim_text(cls, value: str) -> str:
-        return value.strip()
+        return value.strip() if isinstance(value, str) else value
 
     @field_validator("source_hint", "llm_base_url", "llm_model", "llm_api_key", mode="before")
     @classmethod
@@ -177,6 +235,7 @@ class TaskRead(BaseModel):
     keyword: str
     intent: str
     source_hint: str | None
+    source_strategy: str
     llm_provider: str
     llm_model: str
     llm_base_url: str
@@ -202,6 +261,10 @@ class TaskSourceRead(BaseModel):
     domain: str | None = None
     snippet: str | None = None
     selected: bool = True
+    source_type: str | None = None
+    source_quality_score: int | None = None
+    source_quality_reason: str | None = None
+    catalog_source_name: str | None = None
     crawl_mode: Literal["page_crawled", "rss_summary_fallback", "discovered_only"]
     document_title: str | None = None
     document_source_name: str | None = None

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import logging
 import re
 from urllib.parse import parse_qs, unquote, urlparse
 import xml.etree.ElementTree as ET
@@ -12,6 +13,8 @@ from duckduckgo_search import DDGS
 
 from app.config import Settings
 from app.schemas import SearchResultItem
+
+logger = logging.getLogger(__name__)
 
 
 class SearchService:
@@ -150,37 +153,42 @@ class SearchService:
         ddgs_cap = max(self.settings.search_result_limit + 2, 10)
         ddgs_count = 0
 
-        ddgs = DDGS(timeout=self.settings.network_timeout_seconds, proxy=self.settings.preferred_proxy)
-        with ddgs:
-            for query in queries:
-                for item in ddgs.text(query, max_results=self.settings.search_result_limit, backend="auto"):
-                    url = item.get("href")
-                    if not url or url in seen_urls:
-                        continue
-                    seen_urls.add(url)
-                    domain = urlparse(url).netloc or None
-                    if self._is_blocked_domain(domain):
-                        continue
-                    results.append(
-                        SearchResultItem(
-                            url=url,
-                            title=item.get("title") or url,
-                            snippet=item.get("body"),
-                            domain=domain,
-                            rank=rank,
+        try:
+            ddgs = DDGS(timeout=self.settings.network_timeout_seconds, proxy=self.settings.preferred_proxy)
+            with ddgs:
+                for query in queries:
+                    for item in ddgs.text(query, max_results=self.settings.search_result_limit, backend="auto"):
+                        url = item.get("href")
+                        if not url or url in seen_urls:
+                            continue
+                        seen_urls.add(url)
+                        domain = urlparse(url).netloc or None
+                        if self._is_blocked_domain(domain):
+                            continue
+                        results.append(
+                            SearchResultItem(
+                                url=url,
+                                title=item.get("title") or url,
+                                snippet=item.get("body"),
+                                domain=domain,
+                                rank=rank,
+                            )
                         )
-                    )
-                    rank += 1
-                    ddgs_count += 1
+                        rank += 1
+                        ddgs_count += 1
+                        if ddgs_count >= ddgs_cap:
+                            break
                     if ddgs_count >= ddgs_cap:
                         break
-                if ddgs_count >= ddgs_cap:
-                    break
+        except Exception as exc:
+            logger.warning("DuckDuckGo discovery failed; continuing with HTML search fallbacks: %s", exc, exc_info=True)
 
         is_chinese_query = any(not self._looks_english(query) for query in queries)
 
         if is_chinese_query:
-            sogou_results = self._discover_sogou_html(
+            sogou_results = self._safe_discover_html(
+                "Sogou",
+                self._discover_sogou_html,
                 queries=queries,
                 seen_urls=seen_urls,
                 starting_rank=rank,
@@ -188,7 +196,9 @@ class SearchService:
             results.extend(sogou_results)
             rank = len(results) + 1
 
-            baidu_results = self._discover_baidu_html(
+            baidu_results = self._safe_discover_html(
+                "Baidu",
+                self._discover_baidu_html,
                 queries=queries,
                 seen_urls=seen_urls,
                 starting_rank=rank,
@@ -196,7 +206,9 @@ class SearchService:
             results.extend(baidu_results)
             rank = len(results) + 1
 
-        bing_results = self._discover_bing_html(
+        bing_results = self._safe_discover_html(
+            "Bing",
+            self._discover_bing_html,
             queries=queries,
             seen_urls=seen_urls,
             starting_rank=rank,
@@ -205,7 +217,9 @@ class SearchService:
         rank = len(results) + 1
 
         if not is_chinese_query:
-            baidu_results = self._discover_baidu_html(
+            baidu_results = self._safe_discover_html(
+                "Baidu",
+                self._discover_baidu_html,
                 queries=queries,
                 seen_urls=seen_urls,
                 starting_rank=rank,
@@ -218,14 +232,18 @@ class SearchService:
         if self._needs_direct_data_rescue(filtered_results, rescue_context):
             rescue_queries = self._direct_data_rescue_queries(keyword or rescue_context)
             rescue_rank = len(results) + 1
-            rescue_results = self._discover_sogou_html(
+            rescue_results = self._safe_discover_html(
+                "Sogou rescue",
+                self._discover_sogou_html,
                 queries=rescue_queries,
                 seen_urls=seen_urls,
                 starting_rank=rescue_rank,
             )
             rescue_rank = len(results) + len(rescue_results) + 1
             rescue_results.extend(
-                self._discover_baidu_html(
+                self._safe_discover_html(
+                    "Baidu rescue",
+                    self._discover_baidu_html,
                     queries=rescue_queries,
                     seen_urls=seen_urls,
                     starting_rank=rescue_rank,
@@ -233,7 +251,9 @@ class SearchService:
             )
             rescue_rank = len(results) + len(rescue_results) + 1
             rescue_results.extend(
-                self._discover_bing_html(
+                self._safe_discover_html(
+                    "Bing rescue",
+                    self._discover_bing_html,
                     queries=rescue_queries,
                     seen_urls=seen_urls,
                     starting_rank=rescue_rank,
@@ -241,7 +261,9 @@ class SearchService:
             )
             filtered_results = self._filter_relevant_results([*results, *rescue_results], [*queries, *rescue_queries])
         if len(filtered_results) < self.settings.search_result_limit:
-            rss_results = self._discover_google_news_rss(
+            rss_results = self._safe_discover_html(
+                "Google News RSS",
+                self._discover_google_news_rss,
                 queries=queries,
                 seen_urls=seen_urls,
                 starting_rank=rank,
@@ -259,6 +281,21 @@ class SearchService:
             item.model_copy(update={"rank": index})
             for index, item in enumerate(reranked[: self.settings.search_result_limit], start=1)
         ]
+
+    def _safe_discover_html(
+        self,
+        label: str,
+        discoverer,
+        *,
+        queries: list[str],
+        seen_urls: set[str],
+        starting_rank: int,
+    ) -> list[SearchResultItem]:
+        try:
+            return discoverer(queries=queries, seen_urls=seen_urls, starting_rank=starting_rank)
+        except Exception as exc:
+            logger.warning("%s discovery failed; continuing with remaining search fallbacks: %s", label, exc, exc_info=True)
+            return []
 
     def select_for_crawl(
         self,

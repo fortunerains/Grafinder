@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     llm_required: bool = True
     auto_open_browser: bool = False
     llm_providers_file: str = "config/llm_providers.example.json"
+    auth_enabled: bool = True
+    auth_users: str = "admin:grafinder_admin"
+    auth_session_secret: str = "grafinder-local-dev-secret-change-me"
+    auth_session_max_age_seconds: int = 60 * 60 * 24 * 7
+    auth_cookie_secure: bool = False
+    auth_allow_registration: bool = True
 
     @property
     def llm_providers_path(self) -> Path:

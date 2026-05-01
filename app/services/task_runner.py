@@ -29,6 +29,13 @@ def _fingerprint(parts: Iterable[str | None]) -> str:
     return hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
 
+def _friendly_error_message(exc: Exception) -> str:
+    message = str(exc).strip() or exc.__class__.__name__
+    if "builder error" in message.lower():
+        return "搜索组件初始化失败。系统已改为支持备用搜索源，请重新提交任务。"
+    return message
+
+
 class TaskRunner:
     def __init__(self, settings: Settings):
         llm_client = LLMJsonClient(settings)
@@ -115,7 +122,8 @@ class TaskRunner:
                 summary=summary,
             )
         except Exception as exc:
-            await self._update_task(task_id, status=TaskStatus.failed, error_message=str(exc))
+            logger.exception("Task %s failed", task_id)
+            await self._update_task(task_id, status=TaskStatus.failed, error_message=_friendly_error_message(exc))
 
     async def refine_dashboard(self, task_id: int, instruction: str, runtime: LLMRuntimeConfig) -> None:
         try:
@@ -157,7 +165,8 @@ class TaskRunner:
                 last_refinement_instruction=instruction,
             )
         except Exception as exc:
-            await self._update_task(task_id, status=TaskStatus.failed, error_message=str(exc))
+            logger.exception("Dashboard refinement failed for task %s", task_id)
+            await self._update_task(task_id, status=TaskStatus.failed, error_message=_friendly_error_message(exc))
 
     async def get_task_view(self, task_id: int) -> dict:
         async with SessionLocal() as session:
@@ -174,6 +183,7 @@ class TaskRunner:
                 "keyword": task.keyword,
                 "intent": task.intent,
                 "source_hint": task.source_hint,
+                "source_strategy": getattr(task, "source_strategy", None) or "trusted_first",
                 "llm_provider": task.llm_provider,
                 "llm_model": task.llm_model,
                 "llm_base_url": task.llm_base_url,
@@ -232,6 +242,10 @@ class TaskRunner:
                     domain=source.domain,
                     snippet=source.snippet,
                     selected=source.selected,
+                    source_type=getattr(source, "source_type", None),
+                    source_quality_score=getattr(source, "source_quality_score", None),
+                    source_quality_reason=getattr(source, "source_quality_reason", None),
+                    catalog_source_name=getattr(source, "catalog_source_name", None),
                     crawl_mode=crawl_mode,
                     document_title=document.title if document else None,
                     document_source_name=document.source_name if document else None,
